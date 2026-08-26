@@ -10,6 +10,7 @@ from py36_compat import configure_utf8_stdio
 
 
 REQUIRED = (
+    "README.md",
     "SKILL.md",
     "manifest.json",
     "agents/openai.yaml",

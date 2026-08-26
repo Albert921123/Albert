@@ -25,6 +25,7 @@
     "native-scheduler"
   ],
   "required_files": [
+    "README.md",
     "SKILL.md",
     "assets/daily-brief-template.html",
     "assets/codex-subscription-selector.html",

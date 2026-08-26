@@ -1,0 +1,4 @@
+interface:
+  display_name: "建筑行业每日情报"
+  short_description: "跨Agent可降级采集并强制验收搜索功能的HTML日报"
+  default_prompt: "使用 $generate-daily-industry-brief 打开知讯日报设置；按宿主能力在网页搜索、官方源直采或已验证JSON之间降级，并在交付前强制校验独立HTML的搜索、高亮、导航与定时配置。"

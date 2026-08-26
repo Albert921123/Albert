@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>{{DATE}} 知讯日报</title>
+  <style>
+    :root{--ink:#17201d;--muted:#66716c;--paper:#f4f1ea;--card:#fffdfa;--green:#174f3d;--green-2:#0f3d2f;--orange:#d7663f;--line:#d8d2c7;--mobile-topbar-height:0px;--mobile-nav-height:49px;--serif:"Noto Serif SC","Songti SC",SimSun,serif;--sans:Inter,"Microsoft YaHei","PingFang SC",sans-serif}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.7;overflow:hidden}button,input{font:inherit}a{color:var(--green);text-underline-offset:3px}a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--orange);outline-offset:3px}.app-shell{height:100vh;display:flex;flex-direction:column;overflow:hidden}.topbar{position:relative;z-index:10;flex:0 0 auto;background:var(--green);color:#fff;box-shadow:0 8px 24px rgba(15,35,28,.14)}.topbar-inner{width:min(1440px,100%);margin:auto;padding:12px 30px 10px}.topline{display:grid;grid-template-columns:minmax(180px,240px) minmax(0,1fr) minmax(260px,360px);align-items:start;gap:22px}.brand-kicker{margin:0 0 2px;color:#f1b799;font-size:9px;letter-spacing:.14em}.brand h1{margin:0;font:700 clamp(28px,3vw,42px)/1 var(--serif)}.runline{margin:5px 0 0;color:rgba(255,255,255,.68);font-size:10px}.highlights{min-width:0}.highlights-label{margin:0 0 5px;color:#f1b799;font-size:10px;font-weight:700;letter-spacing:.14em}.highlights ol{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:0;padding:0;list-style:none}.highlights a{display:block;min-height:48px;padding:6px 9px;background:rgba(0,0,0,.14);border:1px solid rgba(255,255,255,.15);color:#fff;text-decoration:none;font-size:13px;line-height:1.4}.highlights a:hover{background:rgba(0,0,0,.23)}.business-type{display:block;margin-bottom:2px;color:#f1b799;font-size:9.5px;font-weight:700;letter-spacing:.08em}.search-box{align-self:center}.search-label{display:block;margin:0 0 5px;color:rgba(255,255,255,.72);font-size:9px;letter-spacing:.08em}.search-control{display:flex;background:#fff;border:1px solid rgba(255,255,255,.4)}.search-control input{width:100%;min-width:0;border:0;background:transparent;padding:8px 10px;color:var(--ink);outline:0}.search-control button{display:none;border:0;border-left:1px solid var(--line);background:#fff;color:var(--muted);padding:0 10px;cursor:pointer}.search-control button.show{display:block}.search-status{min-height:14px;margin:3px 0 0;color:rgba(255,255,255,.7);font-size:9px}.meta{display:flex;gap:16px;flex-wrap:wrap;margin-top:7px;padding-top:6px;border-top:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.68);font-size:11px}.meta strong{color:#fff;font-weight:600}.reading-frame{min-height:0;display:grid;grid-template-columns:260px minmax(0,1fr);flex:1}.sidebar{min-height:0;background:#ebe7dd;border-right:1px solid var(--line);overflow-y:auto;padding:24px 20px 30px}.nav-kicker{margin:0;color:var(--orange);font-size:10px;font-weight:700;letter-spacing:.16em}.sidebar h2{margin:3px 0 16px;font:700 24px/1.2 var(--serif)}.topic-nav{display:grid;gap:5px}.topic-nav a{display:grid;grid-template-columns:24px 1fr;gap:8px;align-items:center;padding:9px 10px;border-left:3px solid transparent;color:var(--ink);text-decoration:none;font-size:12px}.topic-nav a:hover{background:rgba(255,255,255,.58)}.topic-nav a.active{border-left-color:var(--orange);background:var(--card);color:var(--green);font-weight:700}.nav-number{color:var(--muted);font-size:9px}.sidebar-summary{margin-top:22px;padding-top:17px;border-top:1px solid var(--line);color:var(--muted);font-size:11px}.sidebar-summary strong{display:block;color:var(--ink);font-size:13px}.content-scroll{min-width:0;min-height:0;overflow-y:auto;overscroll-behavior:contain;scroll-behavior:smooth}.content-inner{width:min(1040px,calc(100% - 48px));margin:0 auto;padding:30px 0 0}.section{scroll-margin-top:28px;margin:0 0 42px}.section[hidden],.story[hidden]{display:none}.section-head{display:none;align-items:end;justify-content:space-between;gap:20px;border-bottom:2px solid var(--ink);padding-bottom:12px}.section-head h2{margin:0;font:700 31px/1.2 var(--serif)}.section-head span{color:var(--muted);font-size:12px}.story{scroll-margin-top:28px;background:var(--card);border:1px solid var(--line);margin-top:16px;padding:26px 28px 26px 110px;position:relative}.story::before{content:attr(data-story-section);position:absolute;top:27px;left:20px;display:inline-block;max-width:76px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;font-weight:700;line-height:1.3;letter-spacing:.04em;color:var(--green);background:#e7efe9;border:1px solid #c6d6cc;border-radius:999px;padding:3px 9px}.story.section-name-hit::before{background:#ffe3a3;color:var(--ink);border-color:#d6a84c}.search-hit{background:#ffe3a3;color:inherit;border-radius:2px;padding:0 1px}.story-index{color:var(--orange);font-weight:700;font-size:11px;letter-spacing:.12em}.freshness-badge{display:inline-block;margin-left:7px;padding:2px 7px;border-radius:999px;background:#f7e2d8;color:#9a431f;font-size:10px;font-weight:700;letter-spacing:0}.story h3{margin:8px 0 18px;font:700 23px/1.45 var(--serif)}.story dl{display:grid;grid-template-columns:110px 1fr;gap:9px 18px;margin:0}.story dt{color:var(--muted);font-size:12px;font-weight:700}.story dd{margin:0}.source{margin:18px 0 0;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-size:12px}.source a::after{content:" ↗"}.judgement{border-left:3px solid var(--orange);padding-left:13px}.empty{background:rgba(255,255,255,.52);border:1px dashed #aaa49a;color:var(--muted);margin-top:16px;padding:28px;text-align:center}.no-results{display:none;margin:20px 0 40px;padding:34px;border:1px dashed #aaa49a;background:rgba(255,255,255,.48);color:var(--muted);text-align:center}.no-results.show{display:block}.signals{scroll-margin-top:28px;background:var(--ink);color:#fff;padding:32px;margin:54px 0}.signals h2{margin:0 0 14px;font:700 27px/1.2 var(--serif)}.signals li+li{margin-top:9px}.foot{border-top:1px solid var(--line);padding:24px 0 44px;color:var(--muted);font-size:11px}
+    .empty strong{display:block;margin-bottom:5px;color:var(--ink)}.empty.section-name-hit{background:#fff0c7;border-color:#d6a84c;color:var(--ink)}.empty.limited{background:#fff4e8;border-color:#d79a72;color:#76513d}.empty.limited strong{color:#9a431f}.related-evidence{margin-top:16px;padding:18px 20px;background:#eef3ef;border:1px solid #c8d7ce}.related-evidence strong{display:block;color:var(--green);font-size:12px}.related-evidence p{margin:6px 0 0}.related-evidence .source{margin-top:10px;padding-top:9px}.coverage-audit{margin:0 0 38px;border:1px solid var(--line);background:rgba(255,255,255,.58)}.coverage-audit summary{cursor:pointer;padding:15px 18px;color:var(--green);font-weight:700}.coverage-audit[open] summary{border-bottom:1px solid var(--line)}.audit-body{padding:16px 18px 20px}.audit-summary{margin:0 0 13px;color:var(--muted);font-size:12px}.audit-grid{display:grid;grid-template-columns:minmax(120px,1.4fr) repeat(5,minmax(62px,.65fr));gap:1px;background:var(--line);border:1px solid var(--line);font-size:11px}.audit-grid>*{background:var(--card);padding:7px 9px}.audit-head{font-weight:700;color:var(--green)}.audit-status-limited{color:#9a431f;font-weight:700}.audit-reasons{margin:13px 0 0;color:var(--muted);font-size:11px}
+    @media(max-width:1080px){.topline{grid-template-columns:200px 1fr}.search-box{grid-column:1/-1}.search-label{display:none}.search-status{margin-bottom:-5px}.highlights ol{grid-template-columns:repeat(3,minmax(180px,1fr));overflow-x:auto}.reading-frame{grid-template-columns:220px minmax(0,1fr)}}
+    @media(max-width:720px){body{overflow:auto;-webkit-overflow-scrolling:touch}.app-shell{height:auto;min-height:100vh;overflow:visible}.topbar{position:sticky;top:0;z-index:30}.topbar-inner{padding:calc(14px + env(safe-area-inset-top,0px)) max(14px,env(safe-area-inset-right,0px)) 12px max(14px,env(safe-area-inset-left,0px))}.topline{display:block}.brand{display:flex;align-items:end;justify-content:space-between;gap:14px}.brand-kicker{display:none}.brand h1{font-size:28px}.runline{margin:0}.highlights{display:none}.search-box{margin-top:10px}.meta{display:none}.reading-frame{display:block}.sidebar{position:sticky;top:var(--mobile-topbar-height);z-index:20;min-height:0;height:var(--mobile-nav-height);overflow-x:auto;overflow-y:hidden;padding:6px max(12px,env(safe-area-inset-right,0px)) 5px max(12px,env(safe-area-inset-left,0px));border-right:0;border-bottom:1px solid var(--line);background:rgba(235,231,221,.98);box-shadow:0 5px 14px rgba(23,32,29,.12);scrollbar-width:none;-webkit-overflow-scrolling:touch}.sidebar::-webkit-scrollbar{display:none}.sidebar h2,.nav-kicker,.sidebar-summary{display:none}.topic-nav{display:flex;width:max-content;min-width:100%;height:100%;align-items:stretch}.topic-nav a{display:flex;align-items:center;padding:5px 11px;border-left:0;border-bottom:2px solid transparent;white-space:nowrap}.topic-nav a.active{border-left:0;border-bottom-color:var(--orange)}.nav-number{display:none}.content-scroll{overflow:visible}.content-inner{width:min(100% - 24px,1040px);padding-top:22px}.section,.signals{scroll-margin-top:calc(var(--mobile-topbar-height) + var(--mobile-nav-height) + 12px)}.story{padding:21px 18px;padding-left:18px}.story::before{position:static;top:auto;left:auto;display:inline-block;max-width:none;margin:0 0 10px}.story dl{grid-template-columns:1fr;gap:2px}.story dd+dt{margin-top:10px}.section-head{display:flex;align-items:start;flex-direction:column}.section-head h2{font-size:27px}}
+    @media(max-width:720px){.audit-body{overflow-x:auto}.audit-grid{min-width:620px}}
+    @media print{body,.app-shell{height:auto;overflow:visible;background:#fff}.topbar{position:static;background:#fff;color:#000;box-shadow:none}.brand-kicker,.runline,.meta,.search-box{color:#555}.highlights a{color:#000;background:#fff;border-color:#bbb}.business-type{color:#555}.reading-frame{display:block}.sidebar{display:none}.content-scroll{overflow:visible}.content-inner{width:100%;padding:18px 0}.story{break-inside:avoid}.signals{background:#fff;color:#000;border:2px solid #000}}
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="topline">
+          <div class="brand">
+            <div>
+              <p class="brand-kicker">CONSTRUCTION INTELLIGENCE · DAILY EDITION</p>
+              <h1>知讯日报</h1>
+            </div>
+            <p class="runline">{{DATE}} · {{TOTAL_ITEMS}} 条 · {{READING_MINUTES}} 分钟</p>
+          </div>
+
+          <section class="highlights" aria-labelledby="highlights-title">
+            <p class="highlights-label" id="highlights-title">今日重点 · 按业务类型</p>
+            <ol>
+              <!-- Select two or three most important items across all sections. Repeat: -->
+              <li><a href="#story-id"><span class="business-type">{{BUSINESS_TYPE}}</span>{{IMPORTANT_INFORMATION}}</a></li>
+            </ol>
+          </section>
+
+          <div class="search-box" role="search">
+            <label class="search-label" for="brief-search">搜索标题、正文、来源或业务关键词</label>
+            <div class="search-control">
+              <input id="brief-search" type="search" placeholder="搜索本期知讯，例如：AI、招标、城市更新" autocomplete="off">
+              <button id="clear-search" type="button" aria-label="清空搜索">清空</button>
+            </div>
+            <p class="search-status" id="search-status" aria-live="polite">输入关键词即可筛选本期内容</p>
+          </div>
+        </div>
+
+        <div class="meta" aria-label="日报信息">
+          <span>生成时间 <strong>{{RUN_TIMESTAMP}}</strong></span>
+          <span>主检索窗口 <strong>{{WINDOW_START}} — {{WINDOW_END}}</strong></span>
+          <span>空板块补充窗口 <strong>{{FALLBACK_WINDOW_START}} — {{WINDOW_START}}</strong></span>
+          <span>收录 <strong>{{TOTAL_ITEMS}} 条</strong></span>
+          <span>其中48小时补充 <strong>{{FALLBACK_ITEM_COUNT}} 条</strong></span>
+          <span>检索覆盖 <strong>{{COVERAGE_COMPLETE}}/{{SELECTED_TOPIC_COUNT}} 板块</strong></span>
+          <span>时区 <strong>{{TIMEZONE}}</strong></span>
+        </div>
+      </div>
+    </header>
+
+    <div class="reading-frame">
+      <aside class="sidebar" aria-label="板块导航窗格">
+        <p class="nav-kicker">CONTENTS</p>
+        <h2>本期板块</h2>
+        <nav class="topic-nav" id="topic-nav" aria-label="板块导航">
+          <!-- Repeat for every selected standard/custom section: -->
+          <a href="#topic-id"><span class="nav-number">01</span><span>{{TOPIC_NAME}}</span></a>
+          <!-- End repeat. -->
+          <a href="#today-signals"><span class="nav-number">↗</span><span>今日信号</span></a>
+        </nav>
+        <div class="sidebar-summary"><strong>{{SELECTED_TOPICS}}</strong>当前共 {{SELECTED_TOPIC_COUNT}} 个关注板块</div>
+      </aside>
+
+      <main class="content-scroll" id="content-scroll" tabindex="-1">
+        <div class="content-inner">
+          <div class="no-results" id="no-results">没有找到匹配内容，请更换关键词或清空搜索。</div>
+
+          <!-- Repeat one section for every selected topic. -->
+          <section class="section" id="topic-id" data-section-name="{{TOPIC_NAME}}" data-section-kind="{{SECTION_KIND_ATTR:standard或custom}}" data-coverage-status="{{SECTION_STATUS:complete或checked-empty或limited}}" data-topic-name="{{TOPIC_NAME}}">
+            <div class="section-head"><h2>{{TOPIC_NAME}}</h2><span>{{SECTION_KIND:标准板块或自定义关注}} · {{TOPIC_ITEM_COUNT}} 条 · {{SECTION_WINDOW_LABEL:24小时内或48小时补充}}</span></div>
+
+            <!-- Repeat article for qualifying items. Give every article a unique id used by 今日重点. -->
+            <article class="story" id="story-id" data-story-section="{{TOPIC_NAME}}" data-freshness-window="{{WINDOW_CLASS:primary-or-fallback}}">
+              <span class="story-index">01 / {{SOURCE_TIER}}</span><span class="freshness-badge">{{FRESHNESS_BADGE:24小时内或48小时补充}}</span>
+              <h3>{{TITLE}}</h3>
+              <dl>
+                <dt>发生了什么</dt><dd>{{FACT_SUMMARY}}</dd>
+                <dt>为何值得关注</dt><dd>{{BUSINESS_RELEVANCE}}</dd>
+                <dt>研判</dt><dd class="judgement">{{INFERENCE_OR_OMIT_ROW}}</dd>
+              </dl>
+              <p class="source">来源：<a href="{{DIRECT_URL}}" target="_blank" rel="noopener noreferrer">{{SOURCE_NAME}}</a> · <time datetime="{{ISO_TIMESTAMP}}">{{DISPLAY_TIMESTAMP}}</time></p>
+            </article>
+
+            <!-- Optional: use when a story is rendered in another primary section but materially informs this section. Do not count as another story. -->
+            <aside class="related-evidence" data-related-section="{{TOPIC_NAME}}">
+              <strong>关联资讯 · {{PRIMARY_TOPIC_NAME}}</strong>
+              <p><a href="#story-id">{{TITLE}}</a>：{{RELATED_BUSINESS_BRIDGE}}</p>
+              <p class="source">来源：<a href="{{DIRECT_URL}}" target="_blank" rel="noopener noreferrer">{{SOURCE_NAME}}</a> · <time datetime="{{ISO_TIMESTAMP}}">{{DISPLAY_TIMESTAMP}}</time></p>
+            </aside>
+
+            <!-- For checked-empty sections, omit article elements and use this card. -->
+            <div class="empty"><strong>已完成本板块检索</strong>已检查 {{SOURCE_FAMILY_COUNT}} 类一手来源，过去48小时暂无值得收录的新动态</div>
+
+            <!-- For limited sections, use this card instead of the normal empty state. -->
+            <div class="empty limited"><strong>检索受限</strong>本板块本次检索覆盖不足，不能判定暂无动态。{{LIMITATION_REASON}}</div>
+          </section>
+
+          <section class="signals" id="today-signals">
+            <h2>今日信号</h2>
+            <ul><!-- Two or three cross-section signals. --></ul>
+          </section>
+
+          <details class="coverage-audit" id="coverage-audit">
+            <summary>检索审计 · {{COVERAGE_COMPLETE}}/{{SELECTED_TOPIC_COUNT}} 板块完成</summary>
+            <div class="audit-body">
+              <p class="audit-summary">候选页面 {{CANDIDATES_OPENED}} 个 · 24小时内收录 {{PRIMARY_ITEM_COUNT}} 条 · 48小时补充 {{FALLBACK_ITEM_COUNT}} 条 · 排除 {{TOTAL_EXCLUDED}} 条</p>
+              <div class="audit-grid" role="table" aria-label="逐板块检索覆盖">
+                <div class="audit-head" role="columnheader">板块</div><div class="audit-head" role="columnheader">来源族</div><div class="audit-head" role="columnheader">候选</div><div class="audit-head" role="columnheader">主收录</div><div class="audit-head" role="columnheader">关联</div><div class="audit-head" role="columnheader">状态</div>
+                <!-- Repeat one six-cell row per selected standard/custom section. -->
+                <div role="cell">{{TOPIC_NAME}}</div><div role="cell">{{SOURCE_FAMILY_COUNT}}</div><div role="cell">{{TOPIC_CANDIDATES}}</div><div role="cell">{{TOPIC_ITEM_COUNT}}</div><div role="cell">{{TOPIC_RELATED_COUNT}}</div><div role="cell">{{COVERAGE_STATUS}}</div>
+              </div>
+              <p class="audit-reasons">排除原因：{{EXCLUSION_REASON_SUMMARY}}</p>
+            </div>
+          </details>
+
+          <footer class="foot">本期优先收录生成时点前滚动24小时内可核验的新信息；仅当单个板块确认24小时内无合格信息时，补充此前24至48小时内资讯并明确标记。所有外部来源均在新窗口打开，链接指向原始或最接近原始的权威来源。</footer>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const search = document.getElementById('brief-search');
+      const clear = document.getElementById('clear-search');
+      const status = document.getElementById('search-status');
+      const noResults = document.getElementById('no-results');
+      const sections = [...document.querySelectorAll('.section')];
+      const stories = [...document.querySelectorAll('.story')];
+      const searchableUnits = [...document.querySelectorAll('.story, .related-evidence, .empty')];
+      const navLinks = [...document.querySelectorAll('.topic-nav a')];
+      const scroller = document.getElementById('content-scroll');
+      const topbar = document.querySelector('.topbar');
+      const mobileMedia = window.matchMedia('(max-width: 720px)');
+
+      const syncMobileStickyOffset = () => {
+        const height = mobileMedia.matches && topbar ? Math.ceil(topbar.getBoundingClientRect().height) : 0;
+        document.documentElement.style.setProperty('--mobile-topbar-height', `${height}px`);
+      };
+      syncMobileStickyOffset();
+      if ('ResizeObserver' in window && topbar) new ResizeObserver(syncMobileStickyOffset).observe(topbar);
+      window.addEventListener('resize', syncMobileStickyOffset, {passive:true});
+      window.addEventListener('orientationchange', syncMobileStickyOffset, {passive:true});
+      if (window.visualViewport) window.visualViewport.addEventListener('resize', syncMobileStickyOffset, {passive:true});
+
+      document.querySelectorAll('a[href^="http://"],a[href^="https://"]').forEach(link => {
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+      });
+
+      const normalize = value => value.toLocaleLowerCase('zh-CN').replace(/\s+/g, ' ').trim();
+      const escapeRegExp = value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const unitOriginals = searchableUnits.map(unit => unit.innerHTML);
+      const highlightUnit = (unit, query) => {
+        const pattern = new RegExp(query.split(' ').filter(Boolean).map(escapeRegExp).join('\\s+'), 'gi');
+        const walker = document.createTreeWalker(unit, NodeFilter.SHOW_TEXT);
+        const textNodes = [];
+        while (walker.nextNode()) textNodes.push(walker.currentNode);
+        textNodes.forEach(node => {
+          const text = node.nodeValue;
+          pattern.lastIndex = 0;
+          if (!pattern.test(text)) return;
+          const fragment = document.createDocumentFragment();
+          let lastIndex = 0;
+          let match;
+          pattern.lastIndex = 0;
+          while ((match = pattern.exec(text)) !== null) {
+            if (match.index > lastIndex) fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+            const mark = document.createElement('mark');
+            mark.className = 'search-hit';
+            mark.textContent = match[0];
+            fragment.appendChild(mark);
+            lastIndex = match.index + match[0].length;
+            if (match[0].length === 0) pattern.lastIndex += 1;
+          }
+          if (lastIndex < text.length) fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+          node.parentNode.replaceChild(fragment, node);
+        });
+      };
+      const filterBrief = () => {
+        const query = normalize(search.value);
+        searchableUnits.forEach((unit, index) => { unit.innerHTML = unitOriginals[index]; });
+        let visibleStories = 0;
+        let visibleSections = 0;
+        sections.forEach(section => {
+          const sectionUnits = [...section.querySelectorAll('.story, .empty')];
+          const sectionNameMatches = normalize(section.dataset.sectionName || '').includes(query);
+          let sectionHasMatch = !query;
+          sectionUnits.forEach(unit => {
+            const matches = !query || sectionNameMatches || normalize(unit.textContent).includes(query);
+            unit.hidden = !matches;
+            unit.classList.toggle('section-name-hit', Boolean(query) && sectionNameMatches);
+            if (matches) {
+              sectionHasMatch = true;
+              if (unit.classList.contains('story')) visibleStories += 1;
+            }
+          });
+          section.hidden = Boolean(query) && !sectionHasMatch;
+          if (!section.hidden) visibleSections += 1;
+        });
+        if (query) searchableUnits.forEach(unit => { if (!unit.hidden) highlightUnit(unit, query); });
+        clear.classList.toggle('show', Boolean(query));
+        noResults.classList.toggle('show', Boolean(query) && visibleSections === 0);
+        status.textContent = query ? `找到 ${visibleStories} 条匹配资讯，${visibleSections} 个匹配板块` : `本期共 ${stories.length} 条资讯，输入关键词即可筛选`;
+      };
+
+      search.addEventListener('input', filterBrief);
+      search.addEventListener('keydown', event => {
+        if (event.key === 'Escape') { search.value = ''; filterBrief(); search.focus(); }
+      });
+      clear.addEventListener('click', () => { search.value = ''; filterBrief(); search.focus(); });
+
+      navLinks.forEach(link => link.addEventListener('click', event => {
+        const target = document.querySelector(link.getAttribute('href'));
+        if (!target) return;
+        event.preventDefault();
+        target.scrollIntoView({behavior:'smooth',block:'start'});
+      }));
+
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(entries => {
+          const visible = entries.filter(entry => entry.isIntersecting).sort((a,b) => b.intersectionRatio-a.intersectionRatio)[0];
+          if (!visible) return;
+          navLinks.forEach(link => link.classList.toggle('active', link.getAttribute('href') === `#${visible.target.id}`));
+        }, {root: window.innerWidth > 720 ? scroller : null, rootMargin:'-10% 0px -72% 0px', threshold:[0,.1,.5]});
+        [...sections, document.getElementById('today-signals')].filter(Boolean).forEach(section => observer.observe(section));
+      }
+
+      filterBrief();
+      requestAnimationFrame(syncMobileStickyOffset);
+    })();
+  </script>
+</body>
+</html>

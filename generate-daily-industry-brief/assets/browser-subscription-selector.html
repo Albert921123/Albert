@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>知讯日报｜个人资讯订阅</title>
+  <style>
+    :root{--ink:#17201d;--paper:#f3f0e9;--cream:#e8e1d4;--green:#174f3d;--orange:#d7663f;--line:rgba(23,32,29,.2);--serif:"Noto Serif SC","Songti SC","SimSun",serif;--sans:Inter,"Microsoft YaHei","PingFang SC",sans-serif}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans)}button,a,input,select{font:inherit}button{color:inherit}.page-shell{min-height:100vh;overflow:hidden}
+    .topbar{height:78px;padding:0 clamp(24px,5vw,74px);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}
+    .brand{color:var(--ink);text-decoration:none;font-weight:700;font-size:17px;letter-spacing:.08em;display:inline-flex;gap:11px;align-items:center}.brand-mark{width:34px;height:34px;display:grid;place-items:center;background:var(--green);color:#f7f2e8;border-radius:50%;font-family:var(--serif);font-size:18px}
+    .topbar-note{font-size:12px;font-weight:600;letter-spacing:.08em;color:#59625e;display:flex;align-items:center;gap:9px}.live-dot{width:8px;height:8px;background:var(--orange);border-radius:50%;box-shadow:0 0 0 4px rgba(215,102,63,.13)}
+    .hero{min-height:590px;padding:72px clamp(24px,7vw,108px);display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:clamp(60px,9vw,150px);align-items:center;position:relative}.hero:before{content:"";position:absolute;width:620px;height:620px;border:1px solid rgba(23,79,61,.1);border-radius:50%;left:42%;top:-230px;box-shadow:0 0 0 90px rgba(23,79,61,.025),0 0 0 180px rgba(23,79,61,.018);pointer-events:none}
+    .hero-copy{position:relative;z-index:1;max-width:740px}.kicker,.section-index{margin:0 0 20px;font-size:11px;letter-spacing:.19em;font-weight:700;color:var(--orange)}.hero h1{margin:0;font-family:var(--serif);font-weight:900;font-size:clamp(48px,6.2vw,92px);line-height:1.08;letter-spacing:-.04em}.hero-lede{margin:32px 0 42px;max-width:610px;font-size:17px;color:#4d5753;line-height:1.9}.hero-meta{display:flex;align-items:center;gap:17px;color:#49534f;font-size:12px;font-weight:600}.hero-meta span{display:flex;align-items:center;gap:7px}.hero-meta b{color:var(--green);font-size:10px}.hero-meta i{width:36px;height:1px;background:var(--line)}
+    .dispatch-card{position:relative;z-index:2;min-height:410px;background:var(--green);color:#f5f0e6;padding:26px 28px;box-shadow:18px 18px 0 #ded6c8;transform:rotate(1.4deg);display:flex;flex-direction:column}.dispatch-head{display:flex;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.28);padding-bottom:16px;font-size:11px;letter-spacing:.13em}.dispatch-title{font-family:var(--serif);font-size:37px;font-weight:700;line-height:1.3;margin:42px 0 36px}.dispatch-stat{display:flex;align-items:center;gap:18px}.dispatch-stat strong{font-family:var(--serif);color:#f1b799;font-size:66px;line-height:1}.dispatch-stat span{font-size:12px;line-height:1.8;color:rgba(255,255,255,.72)}.dispatch-foot{margin-top:auto;font-size:10px;letter-spacing:.18em;color:rgba(255,255,255,.5)}
+    .selector-section{background:#fffdfa;padding:92px clamp(24px,7vw,108px) 108px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.section-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:24px}.section-heading h2{margin:0;font-family:var(--serif);font-size:clamp(34px,4vw,55px);letter-spacing:-.04em}.section-index{margin-bottom:14px}.selection-count{border:1px solid var(--line);padding:12px 18px;font-size:12px;letter-spacing:.08em}.selection-count strong{color:var(--orange);font-size:20px}.selection-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}.selection-actions>button{border:1px solid var(--line);background:transparent;padding:11px 14px;font-size:11px;cursor:pointer;transition:background .15s,color .15s}.selection-actions>button:hover{background:var(--green);color:#fff}.section-note{color:#69726e;margin:18px 0 42px;font-size:13px}
+    .topic-groups{display:grid;gap:52px}.topic-group{display:grid;grid-template-columns:190px minmax(0,1fr);gap:28px;align-items:start}.topic-group-heading{display:flex;gap:15px;padding-top:12px}.topic-group-heading>span{width:30px;height:30px;display:grid;place-items:center;border:1px solid var(--green);border-radius:50%;color:var(--green);font-size:10px;font-weight:700}.topic-group-heading h3{margin:1px 0 7px;font-family:var(--serif);font-size:20px}.topic-group-heading p{margin:0;color:#7a827e;font-size:10px;line-height:1.6}.topic-grid{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line)}
+    .topic-card{--topic-color:var(--green);appearance:none;border:0;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:transparent;min-height:245px;padding:22px;text-align:left;cursor:pointer;display:flex;flex-direction:column;position:relative;transition:background .18s,transform .18s}.topic-card:hover{background:color-mix(in srgb,var(--topic-color) 6%,white)}.topic-card:focus-visible{outline:3px solid var(--orange);outline-offset:-3px}.topic-card.selected{background:var(--topic-color);color:#fff;transform:translateY(-5px);box-shadow:0 5px 0 var(--topic-color)}.topic-number{font-size:10px;letter-spacing:.12em;opacity:.58}.topic-check{position:absolute;right:20px;top:18px;width:26px;height:26px;border:1px solid currentColor;border-radius:50%;display:grid;place-items:center;font-size:15px}.topic-eyebrow{margin-top:auto;font-size:10px;letter-spacing:.17em;font-weight:600;color:var(--topic-color)}.topic-card.selected .topic-eyebrow{color:#f1b799}.topic-card strong{font-family:var(--serif);font-size:30px;margin:8px 0 12px}.topic-description{font-size:12px;line-height:1.7;opacity:.66}
+    .custom-interest-box{margin-top:58px;padding:36px;border:1px solid var(--line);background:var(--paper);display:grid;grid-template-columns:minmax(220px,.7fr) minmax(0,1.3fr);gap:42px}.custom-interest-copy h3{margin:0 0 12px;font-family:var(--serif);font-size:30px}.custom-interest-copy p:last-child{margin:0;color:#68716d;font-size:12px;line-height:1.8}.custom-entry{display:grid;grid-template-columns:1fr auto;gap:9px}.custom-entry input{min-width:0;border:1px solid var(--line);background:#fffdfa;padding:14px 15px}.custom-entry button{border:0;background:var(--green);color:#fff;padding:0 20px;cursor:pointer}.custom-suggestions,.custom-tags{display:flex;gap:8px;flex-wrap:wrap}.custom-suggestions{margin-top:14px}.custom-suggestions button{border:1px solid var(--line);background:#fffdfa;padding:8px 11px;font-size:11px;cursor:pointer}.custom-suggestions button:hover{border-color:var(--orange);color:var(--orange)}.custom-tags{margin-top:18px;min-height:34px}.custom-tag{display:inline-flex;align-items:center;gap:8px;background:var(--orange);color:#fff;padding:8px 10px;font-size:12px}.custom-tag button{border:0;background:transparent;color:#fff;padding:0;cursor:pointer;font-weight:700}.custom-help{margin:10px 0 0;color:#78807c;font-size:10px}
+    .knowledge-section{padding:92px clamp(24px,7vw,108px);background:var(--green);color:#f4efe6;display:grid;grid-template-columns:minmax(0,.8fr) minmax(480px,1.2fr);gap:clamp(55px,9vw,130px);align-items:center}.knowledge-intro .section-index{color:#efad8f}.knowledge-intro h2{margin:0;font-family:var(--serif);font-size:clamp(32px,4vw,52px);line-height:1.35;letter-spacing:-.035em}.knowledge-intro>p:last-child{margin:25px 0 0;color:rgba(255,255,255,.62);font-size:13px;line-height:1.9;max-width:520px}.knowledge-layers{border-top:1px solid rgba(255,255,255,.22)}.knowledge-layers article{display:grid;grid-template-columns:42px 1fr;gap:20px;align-items:center;padding:22px 0;border-bottom:1px solid rgba(255,255,255,.22)}.knowledge-layers article>span{color:#efad8f;font-family:var(--serif);font-size:18px}.knowledge-layers h3{margin:0 0 6px;font-family:var(--serif);font-size:20px}.knowledge-layers p{margin:0;color:rgba(255,255,255,.55);font-size:11px;line-height:1.7}
+    .preview-section{padding:100px clamp(24px,7vw,108px) 112px}.preview-heading{margin-bottom:42px}.edition-tag{font-size:10px;letter-spacing:.18em;padding-bottom:7px;border-bottom:2px solid var(--orange)}.preview-layout{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(290px,.65fr);gap:30px;align-items:start}.preview-paper{background:#fffdfa;border:1px solid var(--line);padding:clamp(24px,4vw,54px);box-shadow:0 14px 34px rgba(35,46,42,.08)}.paper-masthead{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px double var(--ink);padding-bottom:22px}.paper-masthead div{display:flex;flex-direction:column;gap:9px}.paper-masthead span,.paper-masthead time{font-size:9px;letter-spacing:.17em;line-height:1.6}.paper-masthead strong{font-family:var(--serif);font-size:25px}.paper-masthead time{text-align:right}
+    .preview-topic{padding:28px 0 4px;border-bottom:1px solid var(--line)}.preview-topic:last-child{border-bottom:0}.preview-topic-title{--topic-color:var(--green);display:grid;grid-template-columns:32px auto 1fr;gap:12px;align-items:center}.preview-topic-title span{width:28px;height:28px;background:var(--topic-color);color:#fff;display:grid;place-items:center;font-size:9px}.preview-topic-title h3{font-family:var(--serif);margin:0;font-size:25px}.preview-topic-title small{justify-self:end;color:#7b837f;font-size:10px}.preview-story{display:flex;justify-content:space-between;gap:24px;padding:20px 0 22px 44px}.preview-story em{color:var(--orange);font-size:10px;font-style:normal;font-weight:700}.preview-story h4{margin:6px 0 8px;font-family:var(--serif);font-size:18px}.preview-story p{color:#6a726e;margin:0;font-size:12px;line-height:1.8}.story-arrow{font-size:20px;color:var(--green)}.empty-preview{padding:70px 20px;text-align:center;color:#7b837f}
+    .settings-panel{background:var(--ink);color:#f6f1e8;padding:34px 30px;position:sticky;top:24px}.settings-panel .section-index{color:#efad8f}.settings-panel h3{font-family:var(--serif);font-size:30px;margin:0 0 28px}.settings-panel dl{margin:0 0 22px}.settings-panel dl div{display:flex;justify-content:space-between;gap:20px;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.15)}.settings-panel dt{color:rgba(255,255,255,.5);font-size:11px}.settings-panel dd{margin:0;text-align:right;font-size:12px}.schedule-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 14px}.field{display:grid;gap:6px;color:rgba(255,255,255,.55);font-size:10px}.field select,.field input{width:100%;border:1px solid rgba(255,255,255,.22);background:#252e2b;color:#fff;padding:10px 9px}.field-wide{margin-bottom:18px}.primary-button,.copy-button{width:100%;border:0;padding:15px 18px;cursor:pointer;font-weight:700;transition:transform .15s,opacity .15s}.primary-button{background:#e6784e;color:#fff}.copy-button{margin-top:10px;background:transparent;color:#fff;border:1px solid rgba(255,255,255,.34)}.primary-button:hover,.copy-button:hover{transform:translateY(-2px)}.primary-button:disabled,.copy-button:disabled{opacity:.4;cursor:not-allowed;transform:none}.privacy-note,.action-status{color:rgba(255,255,255,.48);font-size:10px;line-height:1.7;margin:16px 0 0}.action-status{color:#f1b799;font-weight:700;min-height:17px}.fallback-prompt-panel{margin-top:14px;border:1px solid rgba(255,255,255,.22);background:#252e2b;padding:12px;display:grid;gap:8px}.fallback-prompt-panel[hidden]{display:none}.fallback-prompt-panel label{color:rgba(255,255,255,.55);font-size:10px;line-height:1.6}.fallback-prompt-panel textarea{width:100%;box-sizing:border-box;border:1px solid rgba(255,255,255,.22);background:#1b2220;color:#f6f1e8;font-family:inherit;font-size:11px;line-height:1.6;padding:10px;resize:vertical}
+    footer{padding:30px clamp(24px,5vw,74px);background:var(--green);color:rgba(255,255,255,.68);display:flex;justify-content:space-between;font-size:11px;letter-spacing:.08em}footer a{color:#fff;text-decoration:none}
+    @media(max-width:980px){.hero{grid-template-columns:1fr 270px;gap:45px}.dispatch-card{min-height:360px}.topic-group{grid-template-columns:1fr;gap:16px}.topic-grid{grid-template-columns:repeat(2,1fr)}.custom-interest-box{grid-template-columns:1fr}.knowledge-section{grid-template-columns:1fr}.preview-layout{grid-template-columns:1fr}.settings-panel{position:static}}
+    @media(max-width:680px){.topbar{height:66px}.topbar-note{font-size:9px}.hero{padding-top:54px;grid-template-columns:1fr}.hero h1{font-size:50px}.hero-meta{gap:8px;flex-wrap:wrap}.hero-meta i{width:14px}.dispatch-card{width:min(100%,330px);min-height:370px;justify-self:center}.selector-section,.preview-section{padding-top:68px;padding-bottom:74px}.section-heading{align-items:flex-start;flex-direction:column}.selection-count{padding:8px 10px;white-space:nowrap}.selection-actions{justify-content:flex-start}.selection-actions>button{padding:8px 10px}.topic-grid{grid-template-columns:1fr}.topic-card{min-height:205px}.custom-interest-box{padding:24px 18px}.custom-entry{grid-template-columns:1fr}.custom-entry button{padding:13px}.knowledge-section{grid-template-columns:1fr}.paper-masthead strong{font-size:18px}.paper-masthead time{display:none}.preview-story{padding-left:0}footer{gap:20px;flex-direction:column}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+  </style>
+</head>
+<body>
+<main class="page-shell">
+  <header class="topbar">
+    <a class="brand" href="#top"><span class="brand-mark">知</span><span>知讯日报</span></a>
+    <div class="topbar-note"><span class="live-dot"></span> 默认 08:30 推送</div>
+  </header>
+
+  <section class="hero" id="top">
+    <div class="hero-copy">
+      <p class="kicker">PERSONAL DAILY BRIEF · 个人资讯订阅</p>
+      <h1>每天，只看你真正<br />关心的行业动态。</h1>
+      <p class="hero-lede">覆盖建筑业务、企业人物、软件科技、政策趋势四大知识域。16 个标准板块均可自由选择，也可以额外输入你自己的兴趣方向。</p>
+      <div class="hero-meta"><span><b>01</b> 选择板块</span><i></i><span><b>02</b> 设置时间</span><i></i><span><b>03</b> 开始接收</span></div>
+    </div>
+    <aside class="dispatch-card">
+      <div class="dispatch-head"><span>今日简报</span><time id="card-date">08 / 09</time></div>
+      <p class="dispatch-title">你的专属<br />行业晨读</p>
+      <div class="dispatch-stat"><strong id="hero-count">2</strong><span>个关注板块<br />单板块最多 20 条</span></div>
+      <div class="dispatch-foot">16 TOPICS · 4 KNOWLEDGE DOMAINS</div>
+    </aside>
+  </section>
+
+  <section class="selector-section" aria-labelledby="selector-title">
+    <div class="section-heading">
+      <div><p class="section-index">01 / SELECT TOPICS</p><h2 id="selector-title">选择你关注的板块</h2></div>
+      <div class="selection-actions">
+        <div class="selection-count"><strong id="selection-count">2</strong> 个标准 · <strong id="custom-count">0</strong> 个自定义</div>
+        <button type="button" id="select-all">全选 16 项</button>
+        <button type="button" id="clear-all">清空</button>
+      </div>
+    </div>
+    <p class="section-note">共 16 个板块，不设选择数量限制。再次点击可取消选择。</p>
+    <div class="topic-groups" id="topic-groups"></div>
+    <div class="custom-interest-box">
+      <div class="custom-interest-copy">
+        <p class="section-index">02 / CUSTOM INTERESTS</p>
+        <h3>可输入您所感兴趣的板块</h3>
+        <p>输入一个或多个关注方向后点击“添加关注”。它们会成为每日知讯中的独立板块，并与推送时间一起支持后续修改。</p>
+      </div>
+      <div>
+        <div class="custom-entry">
+          <input id="custom-interest-input" type="text" maxlength="50" placeholder="例如：AI方向、城市更新、建筑机器人" aria-label="自定义关注板块" />
+          <button id="add-custom-interest" type="button">添加关注</button>
+        </div>
+        <div class="custom-suggestions" aria-label="推荐关注方向">
+          <button type="button" data-interest="AI方向">＋ AI方向</button>
+          <button type="button" data-interest="城市更新">＋ 城市更新</button>
+          <button type="button" data-interest="建筑机器人">＋ 建筑机器人</button>
+          <button type="button" data-interest="低空经济与建设场景">＋ 低空经济</button>
+          <button type="button" data-interest="基础设施REITs">＋ 基础设施REITs</button>
+        </div>
+        <div class="custom-tags" id="custom-interest-tags" aria-live="polite"></div>
+        <p class="custom-help" id="custom-interest-help">最多添加 20 个自定义方向；每个方向最多 50 个字符。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="knowledge-section">
+    <div class="knowledge-intro">
+      <p class="section-index">KNOWLEDGE COVERAGE</p>
+      <h2>知识库不只追新闻，<br />也持续追踪关键人物。</h2>
+      <p>高管观点优先读取原始演讲、业绩会、官方访谈与机构发布，记录“谁在什么场合说了什么，以及为什么值得关注”。</p>
+    </div>
+    <div class="knowledge-layers">
+      <article><span>01</span><div><h3>政府与协会</h3><p>部委、地方主管部门、行业协会与标准机构</p></div></article>
+      <article><span>02</span><div><h3>企业与院所</h3><p>央国企、施工企业、设计院与科研机构</p></div></article>
+      <article><span>03</span><div><h3>软件与科技</h3><p>BIM、造价、项目管理、AI 与工程科技厂商</p></div></article>
+      <article><span>04</span><div><h3>人物与资本</h3><p>高管演讲、业绩会、访谈、并购与投融资</p></div></article>
+    </div>
+  </section>
+
+  <section class="preview-section">
+    <div class="section-heading preview-heading">
+      <div><p class="section-index">02 / PREVIEW</p><h2>明日资讯会长这样</h2></div><span class="edition-tag">DAILY EDITION</span>
+    </div>
+    <div class="preview-layout">
+      <div class="preview-paper">
+        <div class="paper-masthead">
+          <div><span>YOUR DAILY BRIEF</span><strong id="preview-total">早上好，今日最多 40 条精选</strong></div>
+          <time id="preview-date"></time>
+        </div>
+        <div id="preview-topics"></div>
+      </div>
+      <aside class="settings-panel">
+        <p class="section-index">03 / SAVE & START</p>
+        <h3>确认你的订阅</h3>
+        <dl>
+          <div><dt>关注板块</dt><dd id="selected-names">撮合、政府宏观</dd></div>
+          <div><dt>资讯时效</dt><dd>24 小时优先，空板块补充至 48 小时</dd></div>
+          <div><dt>输出文件</dt><dd>完整 HTML 日报</dd></div>
+          <div><dt>每版数量</dt><dd>每板块最多 20 条</dd></div>
+          <div><dt>保存位置</dt><dd>当前设备与自动化任务</dd></div>
+          <div><dt>漏跑处理</dt><dd>同日恢复后检查并补发一次</dd></div>
+        </dl>
+        <div class="schedule-grid">
+          <label class="field">推送频率<select id="cadence"><option value="weekdays">工作日</option><option value="daily">每天</option></select></label>
+          <label class="field">上海时间（UTC+8）<input id="delivery-time" type="time" value="08:30" /></label>
+        </div>
+        <label class="field field-wide">接收位置<select id="delivery-channel"><option value="host-default">当前 Agent / 任务页</option><option value="workbuddy-miniapp">小程序 / 宿主连接器（如 WorkBuddy）</option></select></label>
+        <button class="primary-button" type="button" id="start-subscription">保存并更新每日资讯</button>
+        <button class="copy-button" type="button" id="copy-config">复制订阅配置</button>
+        <p class="action-status" id="action-status" aria-live="polite"></p>
+        <div class="fallback-prompt-panel" id="fallback-prompt-panel" hidden>
+          <label for="fallback-prompt-text">创建/更新指令（请完整复制下方文本，回到 Agent 对话粘贴发送）</label>
+          <textarea id="fallback-prompt-text" readonly rows="10"></textarea>
+        </div>
+        <p class="privacy-note">再次打开本页面会自动载入上次配置。保存后更新原自动化任务并重新核验时间，不会重复创建。</p>
+      </aside>
+    </div>
+  </section>
+  <footer><span>知讯日报 · 让信息回到与你有关的部分</span><a href="#top">返回顶部 ↑</a></footer>
+</main>
+
+<script>
+(() => {
+  const groups = [
+    {id:"business",index:"A",name:"业务与市场",note:"金融数科、项目机会、供需与人才"},
+    {id:"enterprise",index:"B",name:"企业与人物",note:"经营动作、资本与关键声音"},
+    {id:"technology",index:"C",name:"技术与生态",note:"软件、AI 与工程技术"},
+    {id:"policy",index:"D",name:"政策与趋势",note:"宏观、标准与行业方向"}
+  ];
+  const topics = [
+    {id:"fintech",name:"数科",eyebrow:"金融数科",description:"建筑产业链金融服务与数据科技平台动态",color:"#276c5a",sample:"供应链金融平台、客户落地与产业合作动态",group:"business"},
+    {id:"sourcing",name:"寻源",eyebrow:"机会雷达",description:"采购需求、招标线索与供应商机会",color:"#1b6b54",sample:"重点工程采购清单与供应商征集动态",group:"business"},
+    {id:"matching",name:"撮合",eyebrow:"供需连接",description:"合作需求、资源对接与项目撮合进展",color:"#7a4d9f",sample:"产业链上下游合作与项目对接机会",group:"business"},
+    {id:"employment",name:"用工",eyebrow:"人才观察",description:"人才政策、招聘需求与劳务市场变化",color:"#c26345",sample:"建筑业紧缺岗位、人才政策与用工变化",group:"business"},
+    {id:"overseas",name:"海外",eyebrow:"全球视野",description:"出海项目、国际市场与区域风险提示",color:"#167887",sample:"海外工程订单与重点市场准入变化",group:"business"},
+    {id:"leadership",name:"高管观点",eyebrow:"人物声音",description:"行业领导、高管、专家与软件生态关键言论",color:"#963b36",sample:"建筑央企与软件厂商高管谈行业下一步",group:"enterprise"},
+    {id:"enterprise",name:"企业经营",eyebrow:"公司脉搏",description:"订单、业绩、组织调整与战略动作",color:"#315e52",sample:"头部建筑企业订单、战略与组织新变化",group:"enterprise"},
+    {id:"capital",name:"投融资",eyebrow:"资本动向",description:"并购重组、融资、上市公司与产业基金",color:"#835a36",sample:"建筑产业链投融资与并购整合信号",group:"enterprise"},
+    {id:"digital",name:"AI",eyebrow:"智能前沿",description:"AI模型、智能体与建筑行业落地动态",color:"#a06b13",sample:"AI 在设计、施工与经营场景的新落地",group:"technology"},
+    {id:"informatization",name:"建筑软件",eyebrow:"软件生态",description:"BIM、造价、项目管理与企业软件动态",color:"#b64e76",sample:"建筑软件产品、生态合作与客户实践",group:"technology"},
+    {id:"construction-tech",name:"建筑科技",eyebrow:"工程创新",description:"智能建造、机器人、装配式与新材料",color:"#356c78",sample:"智能建造技术与工程现场应用进展",group:"technology"},
+    {id:"government",name:"政府宏观",eyebrow:"政策风向",description:"国家政策、地方行动与宏观环境解读",color:"#b2453d",sample:"部委与重点地区最新政策及行业影响",group:"policy"},
+    {id:"industry-data",name:"行业数据",eyebrow:"数据温度",description:"投资、开工、订单、价格与景气指标",color:"#3c607f",sample:"投资开工、订单与建筑业景气最新变化",group:"policy"},
+    {id:"standards",name:"标准规范",eyebrow:"规则更新",description:"国家标准、行业规范、计价与审查规则",color:"#66554a",sample:"建筑标准规范与工程计价规则更新",group:"policy"},
+    {id:"green",name:"绿色低碳",eyebrow:"低碳转型",description:"绿色建筑、节能改造与双碳实践",color:"#4e7443",sample:"绿色建筑与城市更新低碳实践",group:"policy"},
+    {id:"extended",name:"拓展阅读",eyebrow:"深度精选",description:"研究报告、趋势洞察与长文精读",color:"#4f5b9f",sample:"值得收藏的行业报告与趋势研判",group:"policy"}
+  ];
+  const storageKey = "zhixun-daily-brief-v4.22";
+  const serverSaved = window.__ZHIXUN_INITIAL_CONFIG__ && typeof window.__ZHIXUN_INITIAL_CONFIG__ === "object" ? window.__ZHIXUN_INITIAL_CONFIG__ : {};
+  let saved = Object.keys(serverSaved).length ? serverSaved : {};
+  if (!Object.keys(saved).length) {
+    for (const key of [storageKey,"zhixun-daily-brief-v4.14","zhixun-daily-brief-v4.13","zhixun-daily-brief-v4.11","zhixun-daily-brief-v4.10","zhixun-daily-brief-v4.9","zhixun-daily-brief-v4.6","zhixun-daily-brief-v4.5","zhixun-daily-brief-v4.4","zhixun-daily-brief-v4.3"]) {
+      try { saved = JSON.parse(localStorage.getItem(key) || "{}"); } catch { saved = {}; }
+      if (Object.keys(saved).length) break;
+    }
+  }
+  const subscriptionId = saved.subscription_id || "primary";
+  const isEditing = Boolean(window.__ZHIXUN_EDIT_MODE__) || (Array.isArray(saved.topic_ids) && saved.topic_ids.length > 0) || (Array.isArray(saved.custom_interests) && saved.custom_interests.length > 0);
+  let selected = ["matching","government"];
+  let customInterests = Array.isArray(saved.custom_interests) ? [...new Set(saved.custom_interests.map(value => String(value).trim()).filter(Boolean))].slice(0,20) : [];
+  try {
+    const restored = Array.isArray(saved.topic_ids) ? saved.topic_ids.filter(id => topics.some(topic => topic.id === id)) : [];
+    if (Array.isArray(saved.topic_ids)) {
+      selected = [...new Set(restored)];
+      const savedNames = Array.isArray(saved.topics) ? saved.topics.map(String) : [];
+      const legacyCombined = selected.includes("digital") && !selected.includes("fintech") && (savedNames.includes("AI与数科") || savedNames.includes("AI数科") || !/^4\.(12|13|14|15|16|17|18|19)/.test(String(saved.version || "")));
+      if (legacyCombined) selected.unshift("fintech");
+    }
+    if (saved.cadence) document.getElementById("cadence").value = saved.cadence;
+    if (saved.delivery_time) document.getElementById("delivery-time").value = saved.delivery_time;
+    if (saved.delivery_channel) document.getElementById("delivery-channel").value = saved.delivery_channel;
+  } catch {}
+
+  const groupRoot = document.getElementById("topic-groups");
+  groups.forEach(group => {
+    const section = document.createElement("section");
+    section.className = "topic-group";
+    section.innerHTML = '<div class="topic-group-heading"><span>'+group.index+'</span><div><h3>'+group.name+'</h3><p>'+group.note+'</p></div></div><div class="topic-grid"></div>';
+    const grid = section.querySelector(".topic-grid");
+    topics.filter(topic => topic.group === group.id).forEach(topic => {
+      const index = String(topics.findIndex(item => item.id === topic.id) + 1).padStart(2,"0");
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "topic-card";
+      button.dataset.id = topic.id;
+      button.innerHTML = '<span class="topic-number">'+index+'</span><span class="topic-check"></span><span class="topic-eyebrow">'+topic.eyebrow+'</span><strong>'+topic.name+'</strong><span class="topic-description">'+topic.description+'</span>';
+      button.addEventListener("click",() => { selected = selected.includes(topic.id) ? selected.filter(id => id !== topic.id) : [...selected,topic.id]; render(); });
+      grid.append(button);
+    });
+    groupRoot.append(section);
+  });
+
+  function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, character => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[character]);
+  }
+
+  function addCustomInterests(rawValue) {
+    const candidates = String(rawValue).split(/[,，;；\n]+/).map(value => value.replace(/\s+/g," ").trim()).filter(Boolean);
+    for (const candidate of candidates) {
+      if (candidate.length > 50 || customInterests.length >= 20) continue;
+      if (!customInterests.some(value => value.toLocaleLowerCase() === candidate.toLocaleLowerCase())) customInterests.push(candidate);
+    }
+    document.getElementById("custom-interest-input").value = "";
+    render();
+  }
+
+  function renderCustomInterests() {
+    const root = document.getElementById("custom-interest-tags");
+    root.replaceChildren();
+    customInterests.forEach(interest => {
+      const tag = document.createElement("span");
+      tag.className = "custom-tag";
+      const label = document.createElement("span");
+      label.textContent = interest;
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.setAttribute("aria-label","移除 "+interest);
+      remove.textContent = "×";
+      remove.addEventListener("click",() => { customInterests = customInterests.filter(value => value !== interest); render(); });
+      tag.append(label,remove);
+      root.append(tag);
+    });
+    document.getElementById("custom-interest-help").textContent = customInterests.length ? "已添加 "+customInterests.length+" 个自定义方向，可点击 × 删除。" : "最多添加 20 个自定义方向；每个方向最多 50 个字符。";
+  }
+
+  function getConfig(createSchedule) {
+    const selectedTopics = selected.map(id => topics.find(topic => topic.id === id)).filter(Boolean);
+    return {
+      version:"4.22",
+      subscription_id:subscriptionId,
+      update_existing:true,
+      topics:selectedTopics.map(topic => topic.name),
+      topic_ids:selected,
+      custom_interests:customInterests,
+      industry_scope:"建筑与建筑科技生态",
+      cadence:document.getElementById("cadence").value,
+      delivery_time:document.getElementById("delivery-time").value || "08:30",
+      timezone:"Asia/Shanghai",
+      max_items_per_topic:20,
+      language:"zh-CN",
+      output_format:"html",
+      lookback_hours:24,
+      fallback_lookback_hours:48,
+      fallback_policy:"extend_empty_sections",
+      source_policy:"tier1-first",
+      delivery_channel:document.getElementById("delivery-channel").value,
+      missed_run_policy:"catch_up_same_day",
+      catch_up_dedupe:true,
+      create_schedule:Boolean(createSchedule),
+      host:window.openai ? "codex" : "local"
+    };
+  }
+
+  function render() {
+    const selectedTopics = selected.map(id => topics.find(topic => topic.id === id)).filter(Boolean);
+    const totalSections = selectedTopics.length + customInterests.length;
+    document.querySelectorAll(".topic-card").forEach(button => {
+      const active = selected.includes(button.dataset.id);
+      button.classList.toggle("selected",active);
+      button.setAttribute("aria-pressed",String(active));
+      button.querySelector(".topic-check").textContent = active ? "✓" : "+";
+    });
+    document.getElementById("selection-count").textContent = selected.length;
+    document.getElementById("custom-count").textContent = customInterests.length;
+    document.getElementById("hero-count").textContent = totalSections || "—";
+    const selectedNames = selectedTopics.map(topic => topic.name).concat(customInterests.map(value => "自定义："+value));
+    document.getElementById("selected-names").textContent = selectedNames.join("、") || "尚未选择";
+    document.getElementById("preview-total").textContent = "早上好，今日最多 "+(totalSections * 20)+" 条精选";
+    document.getElementById("start-subscription").disabled = !totalSections;
+    document.getElementById("copy-config").disabled = !totalSections;
+    renderCustomInterests();
+    const preview = document.getElementById("preview-topics");
+    const standardPreview = selectedTopics.map((topic,index) =>
+      '<article class="preview-topic"><div class="preview-topic-title" style="--topic-color:'+topic.color+'"><span>'+String(index+1).padStart(2,"0")+'</span><h3>'+topic.name+'</h3><small>24小时优先 · 空板块补充至48小时 · 最多20条</small></div><div class="preview-story"><div><em>HTML 日报</em><h4>'+topic.sample+'</h4><p>优先筛选运行前24小时内的权威一手信息；本板块确认无信息时，补充24至48小时内动态并明确标记。</p></div><span class="story-arrow">↗</span></div></article>'
+    ).join("");
+    const customPreview = customInterests.map((interest,index) =>
+      '<article class="preview-topic"><div class="preview-topic-title" style="--topic-color:#d7663f"><span>'+String(selectedTopics.length+index+1).padStart(2,"0")+'</span><h3>'+escapeHtml(interest)+'</h3><small>自定义关注 · 24小时优先 · 空板块补充至48小时</small></div><div class="preview-story"><div><em>你的兴趣</em><h4>持续追踪“'+escapeHtml(interest)+'”最新动态</h4><p>按自定义方向检索权威一手来源，并在每日知讯中作为独立板块呈现。</p></div><span class="story-arrow">↗</span></div></article>'
+    ).join("");
+    preview.innerHTML = totalSections ? standardPreview+customPreview : '<div class="empty-preview">请选择标准板块或添加一个自定义关注方向。</div>';
+    localStorage.setItem(storageKey,JSON.stringify(getConfig(false)));
+  }
+
+  async function copyText(text,success) {
+    try { await navigator.clipboard.writeText(text); document.getElementById("action-status").textContent = success; }
+    catch { document.getElementById("action-status").textContent = "浏览器未允许复制，请允许剪贴板权限后重试。"; }
+  }
+
+  async function submitToLocalBridge(config) {
+    if (!/^https?:$/.test(window.location.protocol) || !["127.0.0.1","localhost"].includes(window.location.hostname)) return false;
+    try {
+      const response = await fetch("/submit"+window.location.search,{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify(config)
+      });
+      return response.ok;
+    } catch {
+      return false;
+    }
+  }
+
+  document.getElementById("select-all").addEventListener("click",() => { selected = topics.map(topic => topic.id); render(); });
+  document.getElementById("clear-all").addEventListener("click",() => { selected = []; render(); });
+  document.getElementById("add-custom-interest").addEventListener("click",() => addCustomInterests(document.getElementById("custom-interest-input").value));
+  document.getElementById("custom-interest-input").addEventListener("keydown",event => { if (event.key === "Enter") { event.preventDefault(); addCustomInterests(event.currentTarget.value); } });
+  document.querySelectorAll("[data-interest]").forEach(button => button.addEventListener("click",() => addCustomInterests(button.dataset.interest)));
+  ["cadence","delivery-time","delivery-channel"].forEach(id => document.getElementById(id).addEventListener("change",render));
+  document.getElementById("copy-config").addEventListener("click",() => copyText(JSON.stringify(getConfig(false),null,2),"订阅配置已复制。"));
+  document.getElementById("start-subscription").addEventListener("click",async() => {
+    const config = getConfig(true);
+    localStorage.setItem(storageKey,JSON.stringify(config));
+    const prompt = "使用 $generate-daily-industry-brief，根据下面配置更新或创建订阅。用户已确认，无需再次询问。必须将 custom_interests 中每个自定义方向作为每日HTML知讯的独立板块；每个自定义方向必须独立执行精确字段、来源主体、官方记录和业务交叉检索，零或一条正式资讯时再做全国媒体、专业垂直或可靠镜像扩展。关联资讯卡不能单独完成自定义板块，只要存在直接相关合格事件就必须至少形成一条正式主资讯。必须按 subscription_id 查找并原地更新现有自动化；如旧任务尚无该字段但只有一个知讯日报任务，将其迁移，禁止重复创建。所选时间固定解释为 Asia/Shanghai（UTC+08:00）。更新时间后重新生成绝对首跑时间，同时读取系统真实 nextRunAt 与后台最终持久化循环规则，并运行 verify_schedule.py 双重校验。仅 nextRunAt 匹配但循环规则不匹配时也必须判失败；修正原任务后重新读取两项，仍不匹配则停用错误任务并报告失败。保存当前配置指纹，按订阅ID、上海日期和配置指纹执行同日补发去重；若部署时当天新设时间已经过去，必须立即按当前配置检查并补发一次，旧配置生成的同日HTML不得阻止。宿主恢复或 Agent 下一次启动时再次执行同一检查；如果宿主不支持恢复触发，必须明确告知并建议改用该宿主的云端/常驻调度器（如 WorkBuddy Cloud、系统任务计划、cron 守护等）。\n\n"+JSON.stringify(config,null,2);
+    if (window.openai && typeof window.openai.sendFollowUpMessage === "function") {
+      await window.openai.sendFollowUpMessage({prompt,title:"更新知讯日报订阅"});
+      document.getElementById("action-status").textContent = "更新请求已发送；请在对话中确认原任务时间已更新并通过校验。";
+    } else if (await submitToLocalBridge(config)) {
+      document.getElementById("action-status").textContent = "提交成功。Agent 通常会在 1 分钟内在对话中继续部署。如果对话迟迟没有动静，请发送「继续部署」四个字，Agent 会立即接着完成并反馈部署结果。";
+      document.getElementById("start-subscription").disabled = true;
+    } else {
+      const panel = document.getElementById("fallback-prompt-panel");
+      const field = document.getElementById("fallback-prompt-text");
+      field.value = prompt;
+      panel.hidden = false;
+      try { await navigator.clipboard.writeText(prompt); } catch { /* clipboard unavailable; the visible panel below is the fallback */ }
+      document.getElementById("action-status").textContent = "当前宿主未连接自动回传。已尝试复制创建指令；若剪贴板未成功，请手动全选下方文本复制，回到 Agent 对话粘贴发送。";
+      field.focus();
+      field.select();
+    }
+  });
+
+  const now = new Date();
+  document.getElementById("card-date").textContent = String(now.getMonth()+1).padStart(2,"0")+" / "+String(now.getDate()).padStart(2,"0");
+  const tomorrow = new Date(now); tomorrow.setDate(now.getDate()+1);
+  const weekdays = ["星期日","星期一","星期二","星期三","星期四","星期五","星期六"];
+  document.getElementById("preview-date").innerHTML = tomorrow.getFullYear()+"." + String(tomorrow.getMonth()+1).padStart(2,"0")+"."+String(tomorrow.getDate()).padStart(2,"0")+"<br>"+weekdays[tomorrow.getDay()];
+  render();
+  if (isEditing) {
+    document.getElementById("start-subscription").textContent = "保存修改并更新原任务";
+    document.getElementById("action-status").textContent = "已加载上次配置，可直接修改板块、频率、时间或接收位置。";
+  }
+})();
+</script>
+</body>
+</html>

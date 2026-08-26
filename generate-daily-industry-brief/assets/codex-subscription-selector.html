@@ -1,0 +1,219 @@
+<meta charset="utf-8">
+<style>
+  #zhixun-v4 .topic-option{display:flex;align-items:center;gap:.65rem;min-height:2.75rem;padding:.65rem .8rem;border:1px solid rgba(23,79,61,.24);border-radius:10px;background:rgba(23,79,61,.04);transition:background .16s,border-color .16s,color .16s,transform .16s}
+  #zhixun-v4 .topic-option:hover{border-color:#174f3d;background:rgba(23,79,61,.09)}
+  #zhixun-v4 .topic-option:focus-within{outline:3px solid #d7663f;outline-offset:2px}
+  #zhixun-v4 .topic-option:has(.form-check-input:checked){border-color:#174f3d;background:#174f3d;color:#fff;transform:translateY(-1px)}
+  #zhixun-v4 .topic-option .form-check-input{accent-color:#174f3d}
+  #zhixun-v4 .topic-option:has(.form-check-input:checked) .form-check-label{color:#fff}
+</style>
+<div id="zhixun-v4">
+  <div class="viz-row">
+    <div>
+      <h2>知讯日报订阅设置</h2>
+      <p class="text-muted">任意选择板块；24 小时优先，空板块补充至 48 小时；每板块最多 20 条；最终输出完整 HTML 文件。</p>
+    </div>
+    <span class="viz-badge" id="zhixun-count">已选 2 / 16</span>
+  </div>
+
+  <div class="viz-controls">
+    <button class="btn" type="button" id="zhixun-all">全选</button>
+    <button class="btn btn-ghost" type="button" id="zhixun-clear">清空</button>
+    <label class="form-label">频率
+      <select class="form-select" id="zhixun-cadence">
+        <option value="weekdays" selected>工作日</option>
+        <option value="daily">每天</option>
+      </select>
+    </label>
+    <label class="form-label">上海时间（UTC+8）
+      <input class="form-control" id="zhixun-time" type="time" value="08:30" />
+    </label>
+    <label class="form-label">每板块上限
+      <input class="form-control" id="zhixun-limit" type="number" min="1" max="20" value="20" />
+    </label>
+  </div>
+
+  <div class="viz-grid" id="zhixun-topics" aria-label="资讯板块"></div>
+
+  <div class="viz-card">
+    <h3>可输入您所感兴趣的板块</h3>
+    <p class="text-small text-muted">例如 AI方向、城市更新或建筑机器人；添加后会作为每日知讯的独立板块。</p>
+    <div class="viz-controls">
+      <input class="form-control" id="zhixun-custom-input" type="text" maxlength="50" placeholder="输入自定义关注方向" />
+      <button class="btn" type="button" id="zhixun-custom-add">添加关注</button>
+    </div>
+    <div class="viz-controls" id="zhixun-custom-suggestions">
+      <button class="btn btn-ghost" type="button" data-interest="AI方向">＋ AI方向</button>
+      <button class="btn btn-ghost" type="button" data-interest="城市更新">＋ 城市更新</button>
+      <button class="btn btn-ghost" type="button" data-interest="建筑机器人">＋ 建筑机器人</button>
+      <button class="btn btn-ghost" type="button" data-interest="基础设施REITs">＋ 基础设施REITs</button>
+    </div>
+    <div class="viz-controls" id="zhixun-custom-tags" aria-live="polite"></div>
+  </div>
+
+  <div class="viz-controls">
+    <label class="form-label">接收位置
+      <select class="form-select" id="zhixun-delivery">
+        <option value="host-default" selected>当前平台任务页／通知</option>
+        <option value="workbuddy-miniapp">小程序 / 宿主连接器（如 WorkBuddy）</option>
+      </select>
+    </label>
+    <button class="btn btn-primary" type="button" id="zhixun-create">保存并更新订阅</button>
+  </div>
+  <p class="text-small text-muted" id="zhixun-status" aria-live="polite">时区：Asia/Shanghai</p>
+  <div class="viz-card" id="zhixun-fallback-panel" hidden>
+    <h3>创建/更新指令</h3>
+    <p class="text-small text-muted">请完整复制下方文本，回到 Agent 对话粘贴发送。</p>
+    <textarea class="form-control" id="zhixun-fallback-text" readonly rows="10" style="width:100%;box-sizing:border-box;font-size:12px;line-height:1.6;resize:vertical"></textarea>
+  </div>
+</div>
+
+<script>
+(() => {
+  const root = document.getElementById("zhixun-v4");
+  const topics = [
+    ["fintech", "数科"], ["sourcing", "寻源"], ["matching", "撮合"], ["employment", "用工"],
+    ["overseas", "海外"], ["leadership", "高管观点"], ["enterprise", "企业经营"],
+    ["capital", "投融资"], ["digital", "AI"], ["informatization", "建筑软件"],
+    ["construction-tech", "建筑科技"], ["government", "政府宏观"],
+    ["industry-data", "行业数据"], ["standards", "标准规范"],
+    ["green", "绿色低碳"], ["extended", "拓展阅读"]
+  ];
+  const storageKey = "zhixun-daily-brief-codex-v4.22";
+  let saved = {};
+  try {
+    saved = window.__ZHIXUN_INITIAL_CONFIG__ && typeof window.__ZHIXUN_INITIAL_CONFIG__ === "object"
+      ? window.__ZHIXUN_INITIAL_CONFIG__
+      : JSON.parse(localStorage.getItem(storageKey) || localStorage.getItem("zhixun-daily-brief-codex-v4.14") || localStorage.getItem("zhixun-daily-brief-codex-v4.13") || "{}");
+  } catch { saved = {}; }
+  const validTopicIds = new Set(topics.map((topic) => topic[0]));
+  const restoredTopicIds = Array.isArray(saved.topic_ids) ? saved.topic_ids.filter((id) => validTopicIds.has(id)) : [];
+  const defaults = new Set(Array.isArray(saved.topic_ids) ? restoredTopicIds : ["matching", "government"]);
+  let customInterests = Array.isArray(saved.custom_interests)
+    ? [...new Set(saved.custom_interests.map((value) => String(value).replace(/\s+/g, " ").trim()).filter(Boolean))].slice(0, 20)
+    : [];
+  const subscriptionId = /^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/.test(String(saved.subscription_id || "")) ? String(saved.subscription_id) : "primary";
+  const isEditing = Object.keys(saved).length > 0;
+  const grid = root.querySelector("#zhixun-topics");
+  const count = root.querySelector("#zhixun-count");
+  const createButton = root.querySelector("#zhixun-create");
+  const status = root.querySelector("#zhixun-status");
+
+  if (["daily", "weekdays"].includes(saved.cadence)) root.querySelector("#zhixun-cadence").value = saved.cadence;
+  if (/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(String(saved.delivery_time || ""))) root.querySelector("#zhixun-time").value = saved.delivery_time;
+  if (["host-default", "workbuddy-miniapp"].includes(saved.delivery_channel)) root.querySelector("#zhixun-delivery").value = saved.delivery_channel;
+  if (Number.isInteger(Number(saved.max_items_per_topic))) root.querySelector("#zhixun-limit").value = String(Math.max(1, Math.min(20, Number(saved.max_items_per_topic))));
+  if (isEditing) {
+    createButton.textContent = "保存修改并更新原任务";
+    status.textContent = "已载入上次配置；修改后将更新原任务，不会重复创建。";
+  }
+
+  function selectedIds() {
+    return [...grid.querySelectorAll('input[type="checkbox"]:checked')].map((input) => input.value);
+  }
+
+  function update() {
+    const standardTotal = selectedIds().length;
+    count.textContent = `${standardTotal} 个标准 · ${customInterests.length} 个自定义`;
+    createButton.disabled = standardTotal + customInterests.length === 0;
+    const tags = root.querySelector("#zhixun-custom-tags");
+    tags.replaceChildren();
+    customInterests.forEach((interest) => {
+      const button = document.createElement("button");
+      button.className = "btn";
+      button.type = "button";
+      button.textContent = `${interest} ×`;
+      button.title = `移除 ${interest}`;
+      button.addEventListener("click", () => { customInterests = customInterests.filter((value) => value !== interest); update(); });
+      tags.append(button);
+    });
+  }
+
+  function addCustom(rawValue) {
+    const candidates = String(rawValue).split(/[,，;；\n]+/).map((value) => value.replace(/\s+/g, " ").trim()).filter(Boolean);
+    candidates.forEach((candidate) => {
+      if (candidate.length <= 50 && customInterests.length < 20 && !customInterests.some((value) => value.toLocaleLowerCase() === candidate.toLocaleLowerCase())) customInterests.push(candidate);
+    });
+    root.querySelector("#zhixun-custom-input").value = "";
+    update();
+  }
+
+  topics.forEach(([id, name]) => {
+    const label = document.createElement("label");
+    label.className = "form-check topic-option";
+    const input = document.createElement("input");
+    input.className = "form-check-input";
+    input.type = "checkbox";
+    input.value = id;
+    input.id = `zhixun-${id}`;
+    input.checked = defaults.has(id);
+    const text = document.createElement("span");
+    text.className = "form-check-label";
+    text.textContent = name;
+    label.append(input, text);
+    grid.append(label);
+    input.addEventListener("change", update);
+  });
+
+  root.querySelector("#zhixun-all").addEventListener("click", () => {
+    grid.querySelectorAll('input[type="checkbox"]').forEach((input) => { input.checked = true; });
+    update();
+  });
+  root.querySelector("#zhixun-clear").addEventListener("click", () => {
+    grid.querySelectorAll('input[type="checkbox"]').forEach((input) => { input.checked = false; });
+    update();
+  });
+  root.querySelector("#zhixun-custom-add").addEventListener("click", () => addCustom(root.querySelector("#zhixun-custom-input").value));
+  root.querySelector("#zhixun-custom-input").addEventListener("keydown", (event) => { if (event.key === "Enter") { event.preventDefault(); addCustom(event.currentTarget.value); } });
+  root.querySelectorAll("[data-interest]").forEach((button) => button.addEventListener("click", () => addCustom(button.dataset.interest)));
+
+  createButton.addEventListener("click", async () => {
+    const ids = selectedIds();
+    const names = ids.map((id) => topics.find((topic) => topic[0] === id)[1]);
+    const limitInput = root.querySelector("#zhixun-limit");
+    const limit = Math.max(1, Math.min(20, Number(limitInput.value) || 20));
+    limitInput.value = String(limit);
+    const config = {
+      version: "4.22",
+      subscription_id: subscriptionId,
+      update_existing: true,
+      topics: names,
+      topic_ids: ids,
+      custom_interests: customInterests,
+      industry_scope: "建筑与建筑科技生态",
+      cadence: root.querySelector("#zhixun-cadence").value,
+      delivery_time: root.querySelector("#zhixun-time").value || "08:30",
+      timezone: "Asia/Shanghai",
+      max_items_per_topic: limit,
+      language: "zh-CN",
+      output_format: "html",
+      lookback_hours: 24,
+      fallback_lookback_hours: 48,
+      fallback_policy: "extend_empty_sections",
+      source_policy: "tier1-first",
+      delivery_channel: root.querySelector("#zhixun-delivery").value,
+      missed_run_policy: "catch_up_same_day",
+      catch_up_dedupe: true,
+      create_schedule: true,
+      host: "codex"
+    };
+    try { localStorage.setItem(storageKey, JSON.stringify(config)); } catch { /* storage unavailable */ }
+    const prompt = `使用 $generate-daily-industry-brief，根据下面配置更新或创建订阅。用户已确认，无需再次询问。必须将 custom_interests 中每个自定义方向作为每日HTML知讯的独立板块；每个自定义方向必须独立执行精确字段、来源主体、官方记录和业务交叉检索，零或一条正式资讯时再做全国媒体、专业垂直或可靠镜像扩展。关联资讯卡不能单独完成自定义板块，只要存在直接相关合格事件就必须至少形成一条正式主资讯。必须按 subscription_id 查找并原地更新现有自动化，禁止重复创建。所选时间固定解释为 Asia/Shanghai（UTC+08:00）。更新时间后重新生成绝对首跑时间，同时读取系统真实 nextRunAt 与后台最终持久化循环规则，并运行 verify_schedule.py 双重校验；仅 nextRunAt 匹配但循环规则不匹配时也必须判失败。修正原任务后重新读取两项，仍不匹配则停用并报告失败。保存当前配置指纹，按订阅ID、上海日期和配置指纹执行同日去重；若部署时当天新设时间已过，立即按当前配置检查并补发一次，旧配置日报不得阻止。宿主不支持恢复触发时必须明确报告并建议使用该宿主的云端/常驻调度器（如 WorkBuddy Cloud、系统任务计划、cron 守护等）。\n\n${JSON.stringify(config, null, 2)}`;
+    try {
+      await window.openai.sendFollowUpMessage({ prompt, title: "更新知讯日报订阅" });
+      status.textContent = "提交成功。Agent 通常会在 1 分钟内在对话中继续部署。如果对话迟迟没有动静，请发送「继续部署」四个字，Agent 会立即接着完成并反馈部署结果。";
+    } catch (error) {
+      const panel = root.querySelector("#zhixun-fallback-panel");
+      const field = root.querySelector("#zhixun-fallback-text");
+      field.value = prompt;
+      panel.hidden = false;
+      try { await navigator.clipboard.writeText(prompt); } catch (clipboardError) { /* clipboard unavailable; the visible panel below is the fallback */ }
+      status.textContent = "当前宿主未连接自动回传。已尝试复制创建指令；若剪贴板未成功，请手动全选下方文本复制，回到 Agent 对话粘贴发送。";
+      field.focus();
+      field.select();
+    }
+  });
+
+  update();
+})();
+</script>

@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Zhixun verified news input",
+  "type": "object",
+  "required": ["schema_version", "generated_at", "timezone", "collector", "items"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "timezone": {"type": "string", "minLength": 1},
+    "collector": {
+      "type": "object",
+      "required": ["name", "mode"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "mode": {"enum": ["enterprise-service", "authorized-crawler", "official-feed-aggregator"]}
+      }
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["section_id", "section_label", "title", "source_name", "source_url", "source_tier", "retrieved_at", "verification_status", "content_excerpt"],
+        "properties": {
+          "section_id": {"type": "string", "minLength": 1},
+          "section_label": {"type": "string", "minLength": 1},
+          "title": {"type": "string", "minLength": 1},
+          "published_at": {"type": "string", "format": "date-time"},
+          "event_at": {"type": "string", "format": "date-time"},
+          "source_name": {"type": "string", "minLength": 1},
+          "source_url": {"type": "string", "format": "uri"},
+          "source_tier": {"enum": [1, 2]},
+          "retrieved_at": {"type": "string", "format": "date-time"},
+          "verification_status": {"const": "primary-source-verified"},
+          "content_excerpt": {"type": "string", "minLength": 1},
+          "fact_summary": {"type": "string"},
+          "business_relevance": {"type": "string"},
+          "industry_bridge": {"type": "string"}
+        },
+        "anyOf": [{"required": ["published_at"]}, {"required": ["event_at"]}]
+      }
+    }
+  },
+  "additionalProperties": true
+}
+

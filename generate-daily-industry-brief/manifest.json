@@ -1,0 +1,41 @@
+{
+  "schema": "https://agentskills.io/specification",
+  "name": "generate-daily-industry-brief",
+  "distribution": "universal",
+  "distribution_version": "1.9.8",
+  "core_version": "4.22",
+  "python_compatibility": ">=3.6",
+  "entrypoint": "SKILL.md",
+  "language": "zh-CN",
+  "install_targets": {
+    "common": "~/.agents/skills/generate-daily-industry-brief",
+    "codex": "~/.codex/skills/generate-daily-industry-brief",
+    "claude_code": "~/.claude/skills/generate-daily-industry-brief",
+    "openclaw": "~/.openclaw/skills/generate-daily-industry-brief",
+    "gemini_cli": "~/.gemini/skills/generate-daily-industry-brief"
+  },
+  "fallback_prompt": "entrypoints/通用调用提示词.txt",
+  "optional_capabilities": [
+    "local-python",
+    "local-browser",
+    "web-search",
+    "direct-url-fetch",
+    "external-json-input",
+    "html-search-validator",
+    "native-scheduler"
+  ],
+  "required_files": [
+    "SKILL.md",
+    "assets/daily-brief-template.html",
+    "assets/codex-subscription-selector.html",
+    "references/section-source-catalog.md",
+    "references/discovery-source-ladder.md",
+    "references/runtime-compatibility.md",
+    "references/retrieval-audit.md",
+    "references/retrieval-routing.md",
+    "scripts/verify_install.py",
+    "scripts/py36_compat.py",
+    "scripts/validate_news_input.py",
+    "scripts/validate_html.py"
+  ]
+}

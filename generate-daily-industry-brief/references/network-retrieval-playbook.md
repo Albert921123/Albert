@@ -33,6 +33,10 @@ Record the result in the ledger's `run.network_probe` object:
 
 `internet_reachable: false` requires concrete failed-route evidence. The phrase “没有现成 API/RSS 聚合器” is not an acceptable failure reason. A mode is selectable only when its route is `working`; `skipped-unavailable` and `denied` are not retried until host capabilities change.
 
+### Host-native search rule
+
+For Mode A selection, ask the Agent to inspect its own exposed tool schemas and connectors for any function that takes a keyword query and returns candidate webpages, news or knowledge records. It may have an unfamiliar name; do not require `webSearch`. Prefer a working native search tool, then a working MCP/enterprise connector, then the bundled API bridge when its documented credential is already present. A browser search page is a valid fallback, but classify it as Mode B. The probe record must state the exact tool/connector name and an original source URL opened after discovery. Do not claim a native search route based on the product name, a UI screenshot, an agent assertion that it can browse, or a Python process's inability to list host tools.
+
 ## Direct-network discovery matrix
 
 For every selected board, use the exact source families in `section-source-catalog.md`. A usable transport must run this bounded matrix before a board may be finalized below its screening target, checked-empty, or limited:
@@ -70,3 +74,11 @@ For a controllable personal cloud computer route, a search-engine result page is
 - **limited / baseline**: only when the required route could not actually be completed because public access failed, network policy denied it, the host was interrupted, or all live transports were unavailable. State the failed transport and target type; do not state merely “无 WebSearch”.
 
 No online workflow can guarantee that every field has a brand-new, independently verifiable event within 48 hours. It can, however, guarantee an honest, nonblank card through the continuity ladder whenever a real current related item or observation is available. Never fabricate an event to meet a card target.
+
+## Tavily guided fallback
+
+Tavily is a **last-resort discovery route**, not a reason to skip host-native search, a controllable browser, direct HTTP, official lists, RSS, public APIs or an authorized feed. Offer it only after the A/B/C preflight records no usable live route and `TAVILY_API_KEY` is absent.
+
+The interaction must say why registration is being offered: this host cannot currently conduct public-web discovery and therefore cannot independently verify the day's sources. It must also explain the exact steps without exposing a secret: open `https://app.tavily.com/`; register or log in; create a Key from **API Keys**; paste it only in the host's masked/local secret field. On graphical local Python hosts, `scripts/setup_tavily.py` performs this flow, verifies a harmless query before saving, and on Windows persists only the current user's `TAVILY_API_KEY` environment setting. On other hosts the Agent must use the host's documented secret store or keep the activation session-only; it may never request the Key in ordinary chat.
+
+A search result from Tavily is a discovery lead only. The normal original-page time, actor, fact and direct-URL verification remains compulsory.

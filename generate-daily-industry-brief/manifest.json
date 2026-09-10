@@ -2,8 +2,8 @@
   "schema": "https://agentskills.io/specification",
   "name": "generate-daily-industry-brief",
   "distribution": "universal",
-  "distribution_version": "1.30.0",
-  "core_version": "4.69",
+  "distribution_version": "1.35.2",
+  "core_version": "4.77",
   "python_compatibility": "optional >=3.6",
   "entrypoint": "SKILL.md",
   "language": "zh-CN",
@@ -50,8 +50,12 @@
     "scripts/validate_news_input.py",
     "scripts/validate_retrieval_ledger.py",
     "scripts/probe_network.py",
+    "scripts/search_api_bridge.py",
+    "scripts/setup_tavily.py",
     "scripts/validate_html.py",
     "scripts/create_reading_receipt.py",
-    "scripts/verify_reading_receipt.py"
+    "scripts/verify_reading_receipt.py",
+    "scripts/verify_delivery_gate.py",
+    "scripts/verify_editorial_gate.py"
   ]
 }

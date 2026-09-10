@@ -19,6 +19,19 @@ Determine capabilities from the actual tool list and harmless read-only probes. 
 
 If the skill arrived as a ZIP attachment, reading `SKILL.md` from the temporary attachment directory is not installation. Preserve the complete directory tree, run `scripts/verify_install.py` when Python is available, and install or mount it in a persistent skill directory before claiming recurring use. Without Python, verify the required files manually from `manifest.json` and record `manual-install-check`. If the host cannot persist files, use attachment mode only for the current turn and state that a later automation cannot rely on the attachment.
 
+## Native-search selection gate
+
+Mode A means **any host-native capability that accepts a keyword query and returns candidate webpages/news records**. It is not limited to a tool literally called `webSearch`, and it does not require a separately purchased API key.
+
+Before the first board query, the Agent itself must inspect its exposed tools, connectors and documented browser integrations, then make one harmless, topic-relevant probe in this order:
+
+1. a native keyword-search, news-search, knowledge-search or browser-search tool (regardless of its exact name);
+2. a configured MCP or enterprise search connector;
+3. `scripts/search_api_bridge.py` when a documented local or centrally managed credential exists;
+4. a controllable browser search-results page, which is Mode B rather than Mode A because the Agent is operating a webpage.
+
+Record the exact capability name, route class, probe query, whether candidate URLs were returned, one original page opened for verification, and the failure reason if it did not work. Product branding (for example Codex, WorkBuddy, Claude Code or yz claw), a generic statement that the Internet is available, or the absence of `webSearch` is not capability evidence. A missing option is `skipped-unavailable`; immediately test the next route. Platform-native tools are normally visible only to the Agent, not to a local Python process, so a bundled script cannot discover or invoke a hidden host tool. Search output is discovery only and never replaces original-page verification.
+
 ## Retrieval modes
 
 Choose the highest available mode. Never silently jump to model memory or widen the time window. A live outbound connection must use Mode A or Mode B; Mode C is an enhancement or a last resort only when direct live retrieval genuinely cannot be performed. Optional unavailable modes are recorded as skipped, not treated as failures of the report. For every selected row, apply `coverage-continuity.md`: a qualifying 24/48-hour card is preferred; otherwise output a transparent extended-related or baseline-tracking card rather than a blank block.

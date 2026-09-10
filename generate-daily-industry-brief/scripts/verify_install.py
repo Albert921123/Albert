@@ -34,6 +34,8 @@ REQUIRED = (
     "scripts/validate_news_input.py",
     "scripts/validate_retrieval_ledger.py",
     "scripts/probe_network.py",
+    "scripts/search_api_bridge.py",
+    "scripts/setup_tavily.py",
     "scripts/verify_schedule.py",
     "scripts/create_reading_receipt.py",
     "scripts/verify_reading_receipt.py",
@@ -44,7 +46,7 @@ def main():
     configure_utf8_stdio()
     parser = argparse.ArgumentParser()
     parser.add_argument("--skill-dir", type=Path, default=Path(__file__).resolve().parent.parent)
-    parser.add_argument("--expected-version", default="1.30.0")
+    parser.add_argument("--expected-version", default="1.35.2")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
 

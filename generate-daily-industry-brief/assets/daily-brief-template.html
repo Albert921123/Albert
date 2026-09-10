@@ -58,7 +58,7 @@
     .search-box{padding-top:42px}.highlights-label,.search-label{display:flex;align-items:center;height:20px;margin:0 0 6px}.highlights-label{justify-content:center;text-align:center}.search-label{justify-content:flex-start}.search-control input{min-height:48px;padding:8px 11px;font-size:15px}.search-status{min-height:20px;margin-top:6px;font-size:12px}
     .meta{margin-top:8px;padding-top:7px;font-size:11px}
     .topic-nav{display:block}.nav-featured{margin-bottom:12px;background:var(--card);border-left-color:var(--orange)!important;color:var(--green)!important;font-weight:700}.nav-group{display:grid;gap:2px;margin:0 0 12px}.nav-group-title{margin:6px 10px 3px;color:var(--orange);font-size:10px;font-weight:800;letter-spacing:.12em}.nav-group .topic-nav-link{padding-top:7px;padding-bottom:7px}.nav-group .nav-number{font-size:9px}
-    .highlights ol{margin:0;padding:0;list-style:none}.highlights ol>li{margin:0;padding:0;list-style:none}.management-map .chain-card{padding:16px 18px}.management-map .chain-title{padding-bottom:9px}.management-map .chain-title>span{font-size:11px}.management-map .chain-status{font-size:12px}.management-map .chain-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:13px 0 0;padding:0;gap:12px;list-style:none}.management-map .chain-steps li{min-height:0;padding:11px 12px;background:#f2f6f1;border-left:3px solid #6b927d}.management-map .chain-steps li:not(:last-child)::after{content:none}.management-map .chain-steps b{margin-bottom:4px}.management-map .chain-steps a{font-size:14px}.management-map .chain-steps small{margin-top:5px}.chain-note{margin:12px 0 0;padding:10px 12px;background:#e9f0eb;color:#32463c;font-size:14px;line-height:1.7}.chain-note strong{color:#175b46}.management-map-head>p{max-width:560px}
+    .highlights ol{margin:0;padding:0;list-style:none}.highlights ol>li{margin:0;padding:0;list-style:none}.management-map .chain-card{padding:16px 18px}.management-map .chain-title{padding-bottom:9px}.management-map .chain-title>span{font-size:11px}.management-map .chain-status{font-size:12px}.management-map .chain-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:13px 0 0;padding:0;gap:12px;list-style:none}.management-map .chain-steps li{min-height:0;padding:11px 12px;background:#f2f6f1;border-left:3px solid #6b927d}.management-map .chain-steps li:not(:last-child)::after{content:none}.management-map .chain-steps b{margin-bottom:4px}.management-map .chain-steps a{font-size:14px}.management-map .chain-steps small{margin-top:5px}.chain-note{margin:12px 0 0;padding:10px 12px;background:#e9f0eb;color:#32463c;font-size:14px;line-height:1.7}.management-map-head>p{max-width:560px}.empty.limited-card{margin-top:16px;padding:18px 20px;text-align:left;background:#fffdf8;border:1px solid #e4dac6;border-left:4px solid #b89b5b;color:#514a3d}.limited-card .story-index{margin:0 0 5px;color:#c86d47;font-weight:700}.limited-card h3{margin:0 0 12px;color:#705b2c;font:700 20px/1.35 var(--serif)}.limited-card .limited-reason{max-width:960px;margin:0;padding:11px 13px;background:#f5f1e7;font-size:14px;line-height:1.7}
     @media(max-width:1500px){.topline{grid-template-columns:minmax(220px,260px) minmax(0,1fr) minmax(290px,320px)}.highlights a{min-height:68px}}
     @media(max-width:1080px){.topline{grid-template-columns:200px minmax(0,1fr)}.search-box{grid-column:1/-1;padding-top:0}}
     @media(max-width:720px){.topbar-inner{padding:calc(14px + env(safe-area-inset-top,0px)) max(14px,env(safe-area-inset-right,0px)) 12px max(14px,env(safe-area-inset-left,0px))}.nav-featured{margin:0}.topic-nav{display:flex}.nav-group{display:contents}.nav-group-title{display:none}.nav-group .topic-nav-link{padding:5px 11px}.management-map .chain-card{padding:15px}.management-map .chain-steps{grid-template-columns:1fr}.management-map-head>p{font-size:13px}}
@@ -151,7 +151,7 @@
                 <li><b>{{SLOT_TWO_LABEL:行业或场景}}</b><a href="#{{SLOT_TWO_STORY_ID}}">{{SLOT_TWO_TITLE}}</a><small>{{SLOT_TWO_FACT}}</small></li>
                 <li><b>{{SLOT_THREE_LABEL:企业或项目}}</b><a href="#{{SLOT_THREE_STORY_ID}}">{{SLOT_THREE_TITLE}}</a><small>{{SLOT_THREE_FACT}}</small></li>
               </ol>
-              <p class="chain-note"><strong>核验重点：</strong>{{RECOMMENDATION_CHECKPOINT}}</p>
+              <p class="chain-note">{{RECOMMENDATION_CHECKPOINT}}</p>
             </article>
           </section>
 
@@ -194,8 +194,12 @@
               </ul>
             </div>
 
-            <!-- For limited sections, use this card instead of the normal empty state. -->
-            <div class="empty limited" data-empty-state="limited"><strong>检索受限</strong>本板块本次检索覆盖不足，不能判定暂无动态。{{LIMITATION_REASON}}</div>
+            <!-- For limited sections, use one concise, truthful coverage card instead of a normal empty state. -->
+            <div class="empty limited-card" data-empty-state="limited">
+              <p class="story-index">{{TOPIC_NAME}} / 覆盖说明</p>
+              <h3>本轮暂无独立资讯</h3>
+              <p class="limited-reason">{{LIMITATION_REASON:本次24小时主窗口及24—48小时补充窗口内，未取得同时满足直接来源、时间可核验且仅归属本板块的独立资讯。}}</p>
+            </div>
           </section>
 
           <section class="signals management-actions" id="today-signals">

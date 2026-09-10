@@ -46,7 +46,7 @@ def main():
     configure_utf8_stdio()
     parser = argparse.ArgumentParser()
     parser.add_argument("--skill-dir", type=Path, default=Path(__file__).resolve().parent.parent)
-    parser.add_argument("--expected-version", default="1.35.2")
+    parser.add_argument("--expected-version", default="1.35.3")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
 

@@ -36,6 +36,9 @@ def main():
     text=a.html_file.read_text(encoding="utf-8")
     parser=CardParser(); parser.feed(text)
     issues=[]
+    if "今日推荐关注" not in text: issues.append("missing 今日推荐关注")
+    for marker in ("管理层动作清单", "management-actions", "today-signals"):
+        if marker in text: issues.append("obsolete management-action block is present: %s" % marker)
     for index,card in enumerate(parser.cards):
         kind=card["attrs"].get("data-entry-kind","")
         if kind not in ("primary","date-observation","expanded","business-observation"): continue

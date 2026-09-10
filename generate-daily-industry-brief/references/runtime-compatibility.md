@@ -72,6 +72,10 @@ Use only user-supplied documents or previously cached records. Label the artifac
 
 If none of Modes A–C is available, stop before making factual news claims. Produce a continuous-tracking HTML with one `基线追踪` card per selected row, clearly marked non-real-time and linked to an authority entry point; model memory is not a current-information source. Do not write a success marker.
 
+### Guided Tavily fallback
+
+Tavily is available only after the Agent has recorded that host-native search, a controllable browser/cloud desktop, direct HTTP or official lists/RSS/public APIs, and any validated external feed are unavailable. It is not a replacement for those routes. If `TAVILY_API_KEY` is absent at that point, explain that this host cannot independently retrieve and verify current webpages; open `https://app.tavily.com/`; tell the user to register or log in, create a Key under **API Keys**, and paste it only into a masked local or host-secret input. On local graphical Python hosts, run `scripts/setup_tavily.py`; it verifies a harmless query before Windows stores the key for the current user. Never request or display the Key in ordinary chat, source code, HTML, the ledger or a shared package. A Tavily result is still discovery evidence only and every admitted item must be verified on its original page.
+
 ## Standalone HTML delivery
 
 The searchable report depends on the template's inline JavaScript, not on web search or internet access.

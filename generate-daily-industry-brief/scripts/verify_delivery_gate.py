@@ -5,7 +5,7 @@ import argparse, hashlib, json, re, sys
 from pathlib import Path
 
 REQUIRED_IDS=("brief-search","clear-search","search-status","topic-nav","content-scroll","no-results","management-map")
-REQUIRED_CLASSES=("shell","top","headline","highlights","highlights-label","topic-nav","section","coverage-audit","audit-body","audit-grid")
+REQUIRED_CLASSES=("app-shell","topbar","brand","highlights","highlights-label","topic-nav","section","coverage-audit","audit-body","audit-grid")
 MARKERS=("filterBrief","searchableUnits","ResizeObserver","scrollIntoView","Enter")
 
 def main():
@@ -27,6 +27,11 @@ def main():
     for value in MARKERS:
         if value not in script: issues.append("search/navigation script is missing marker: "+value)
     if "coverage-audit" not in template or "management-map" not in template: issues.append("approved template lacks required shell markers")
+    if "今日推荐关注" not in html: issues.append("missing 今日推荐关注")
+    for marker in ("管理层动作清单", "management-actions", "today-signals"):
+        if marker in html: issues.append("obsolete management-action block is present: "+marker)
+    if re.search(r"chain-steps\\s+li:not\\(:last-child\\)::after\\s*\\{[^}]*content\\s*:\\s*['\\\"](?:→|↓)", html):
+        issues.append("recommendation cards contain obsolete directional arrows")
     print(json.dumps({"ok":not issues,"html_file":str(a.html_file.resolve()),"template_sha256":hashlib.sha256(template.encode("utf-8")).hexdigest(),"issues":issues},ensure_ascii=False,indent=2))
     return 0 if not issues else 2
 if __name__=="__main__": sys.exit(main())

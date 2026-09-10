@@ -22,12 +22,21 @@ REQUIRED = (
     "references/retrieval-audit.md",
     "references/retrieval-routing.md",
     "references/runtime-compatibility.md",
+    "references/network-retrieval-playbook.md",
+    "references/role-profiles.md",
+    "references/coverage-continuity.md",
+    "references/editorial-standard.md",
+    "references/macro-editorial-architecture.md",
     "references/news-input-schema.json",
     "scripts/validate_preferences.py",
     "scripts/py36_compat.py",
     "scripts/validate_html.py",
     "scripts/validate_news_input.py",
+    "scripts/validate_retrieval_ledger.py",
+    "scripts/probe_network.py",
     "scripts/verify_schedule.py",
+    "scripts/create_reading_receipt.py",
+    "scripts/verify_reading_receipt.py",
 )
 
 
@@ -35,7 +44,7 @@ def main():
     configure_utf8_stdio()
     parser = argparse.ArgumentParser()
     parser.add_argument("--skill-dir", type=Path, default=Path(__file__).resolve().parent.parent)
-    parser.add_argument("--expected-version", default="1.9.8")
+    parser.add_argument("--expected-version", default="1.30.0")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
 

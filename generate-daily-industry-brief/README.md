@@ -1,6 +1,6 @@
 # generate-daily-industry-brief · 知讯日报 Skill
 
-> 一个可以安装到多种 AI Agent 的中文行业资讯技能：按用户选择的板块检索近 24 小时信息，空板块可回补 24—48 小时内容，最终生成带来源链接、导航和关键词搜索的独立 HTML 日报。
+> 一个可以安装到多种 AI Agent 的中文行业资讯技能：先按经营岗、生产岗或研究岗生成不同的选择场景与 1–10 板块相关度，再按用户选择的板块检索近 24 小时信息；空板块可回补 24—48 小时、扩展相关资讯或透明基线追踪卡，最终生成带来源链接、导航和关键词搜索的独立 HTML 日报。宽口径板块采用“字段优先、建筑关联加权”；同一事件只归入相关度最高的一个板块，避免重复。
 
 **它不是一份固定新闻模板，也不是模型凭记忆拼出的摘要，而是一套“订阅配置 + 分板块检索 + 来源核验 + HTML 交付 + 定时校验”工作流。**
 
@@ -16,7 +16,7 @@
 - **换一个 Agent 就失效**：交互界面、搜索、定时和检索能力依赖某个平台
 - **定时设置看似成功**：显示了时间，却没有核对真实 `nextRunAt` 和后台循环规则
 
-这个 Skill 会让用户先选择标准板块、添加自定义关注方向、设置频率和上海时间，再按同一份配置持续生成日报。每个自定义兴趣都会成为独立板块，不会被合并或丢弃。
+这个 Skill 会先让用户选择岗位画像，再选择标准板块、添加自定义关注方向、设置频率和上海时间，并按同一份配置持续生成日报。每个自定义兴趣都会成为独立板块，不会被合并或丢弃。
 
 ---
 
@@ -95,6 +95,18 @@ $generate-daily-industry-brief
 
 用户还可以输入最多 20 个自定义关注方向，例如“城市更新”“专项债”“半导体”“游戏”或“外贸”。每个自定义方向都会被单独检索，并作为每日 HTML 中的独立板块输出。
 
+## 岗位画像与相关度
+
+首次配置或后续修改时可选三种预设；用户仍可勾选任意板块、手工调整任一分值，或选“自定义”。分值只决定检索深度、来源优先级和排版顺序，不会排除用户已选板块。
+
+| 画像 | 默认重点 | 高分来源方向 |
+|---|---|---|
+| 经营岗 | 企业经营、投融资、高管观点 | 公司 IR、交易所披露、业绩会、产业基金、监管与招采平台 |
+| 生产岗 | 寻源、用工、撮合、建筑科技 | 公共资源/采购平台、业主与央国企采购、人社与项目公告 |
+| 研究岗 | 政府宏观、标准规范、行业数据 | 国务院和部委、地方政府、标准化机构、统计部门与行业协会 |
+
+`9–10` 分执行四条检索路径并优先争取 2–3 条独立卡；`7–8` 分执行三条路径；`4–6` 分至少执行字段和官方记录两条路径；低分但已选择的板块仍会独立检索。完整评分与具体来源在 [`references/role-profiles.md`](references/role-profiles.md)。
+
 ---
 
 ## 工作原理
@@ -124,7 +136,9 @@ $generate-daily-industry-brief
 3. 48 小时补充必须明确标记，不能扩展到 72 小时或近一周
 4. 优先政府、监管、交易所、招采平台、公司官网、投资者关系和官方活动实录等一手来源
 5. 先广度覆盖全部板块，再核验候选，避免一个板块耗尽全部检索预算
-6. 每板块最多 20 条，数量不足时宁缺毋滥
+6. 每板块最多 20 条；每板块以 2 条（高相关板块 3 条）作为**候选筛选深度目标**，而非输出配额。普通板块的台账至少要有 4 个真实候选、2 个独立来源族；高相关、7–10 分或宽泛自定义板块至少要有 6 个真实候选、3 个独立来源族。必须先初筛完必经来源路径中发现的全部候选，再逐条打开核验所有通过初筛的候选；后续候选只有通过时效、来源、相关性与去重核验时才加入。高相关板块还必须比较宏观/行业来源与企业/项目来源，不能以一条项目公告替代整个板块。仅在候选池耗尽、其余候选均有具体排除原因，或达到该板块条数上限时才能结束，不能在首条或第 3 条结果后停止；若只有 1 条合格，允许只输出 1 条，但必须完成上述候选深度并记录低于目标的原因。台账数字、HTML 卡片数与排除记录不一致时，校验将失败，不能交付为正式日报。
+7. 正文开头将已核验卡组织为 2–3 条“今日经营主线”：政策/制度 → 行业/资本/应用 → 企业/项目 → 管理动作。每层回链至本期事实卡；证据不足时明确写“两层待补”，不把地方项目或企业个案伪装成国家趋势。
+8. 每个已选板块都不留视觉空白：实时正式资讯 → 48 小时补充 → 有明确影响链的扩展相关资讯 → 业务观察。只有 Mode D（无可用实时网络及验证输入）可使用明确标注为“非当日新闻”的基线追踪卡；联网检索未完成时不得用基线卡替代检索，也不得交付半成品日报。
 
 Skill 会根据 Agent 的真实能力选择检索模式：
 
@@ -135,7 +149,11 @@ Skill 会根据 Agent 的真实能力选择检索模式：
 | C | 无网页能力，但可读取已验证结构化数据 | 校验外部 JSON 数据源后生成 |
 | D | 只有离线或缓存材料 | 明确标注“非实时/检索受限”，不冒充完整日报 |
 
-没有实时搜索、网页读取或当期已验证数据源时，Skill 不会用模型记忆编造今日新闻。
+`WebSearch` 和 `WebFetch` 不是联网检索的前提。Skill 会先读取宿主实际暴露的工具和连接器：若有搜索 API（名称可能是 `webSearch`、`search_web`、`internet_search`、`browser.search`、知识/新闻搜索，或已配置的 Bing/Google/SerpAPI 类连接器），优先用其中已验证可用的一项做广度发现；不猜测未暴露的接口、密钥或工具名。若没有可用搜索 API，只要 Agent 能通过浏览器、命令行 HTTP（例如 `curl`、PowerShell、Node 或 Python 标准库）、RSS/站点地图、官网栏目页、公开 API、站内搜索或浏览器中的搜索页访问公共网页，Skill 就必须走 Mode A/B 自主检索；不会因为“没有现成 API 或 RSS 聚合器”要求用户先制作 JSON feed。JSON feed 仅用于增强覆盖或在所有直接联网路径均不可用时兜底。完整规则见 [`references/network-retrieval-playbook.md`](references/network-retrieval-playbook.md)。
+
+若 Agent 暴露了可操作的个人云电脑、云浏览器或远程桌面，该会话属于 **Mode B 浏览器检索能力**：Skill 要求 Agent 直接在其中完成关键词搜索、打开原文、核验日期和保存来源链接；不应要求用户截图或复制搜索结果。仅当云桌面对 Agent 是只读、断开、登录受限或根本未暴露控制能力时，才记录为不可用并转用其他路径。
+
+没有实时搜索、网页读取或当期已验证数据源时，Skill 不会用模型记忆编造今日新闻；会改为可读的连续追踪版，逐板块说明能力限制与权威入口。Python 也是可选项：没有 Python 时可照常配置、生成 HTML，并在审计中标记为人工校验。
 
 ### 3. 生成可独立打开的 HTML
 
@@ -144,24 +162,29 @@ Skill 会根据 Agent 的真实能力选择检索模式：
 - 桌面端左侧板块导航
 - 手机端横向板块标签
 - 固定顶部信息区和独立内容滚动区
-- 标题、正文、来源和业务关键词搜索及高亮
+- 标题、正文、来源和业务关键词搜索及高亮；加大搜索说明文字并保留舒适的顶部间距
 - 点击来源后在新窗口打开原始网页
-- 重要信息摘要和业务类型提示
+- 重要信息摘要、业务类型提示、今日经营主线与管理层动作清单
 - 响应式排版，兼容桌面与手机浏览
+- 跨板块完整内容卡，避免自定义板块“拿走”标准板块内容
+- 逐候选检索台账，记录收录与排除原因
 
 最终文件名为：
 
 ```text
 daily-industry-brief-YYYY-MM-DD.html
+retrieval-ledger-YYYY-MM-DD.json
 ```
 
 生成后必须通过：
 
 ```bash
-python scripts/validate_html.py daily-industry-brief-YYYY-MM-DD.html
+python scripts/validate_retrieval_ledger.py retrieval-ledger-YYYY-MM-DD.json --expected-sections <板块总数>
+python scripts/validate_html.py daily-industry-brief-YYYY-MM-DD.html --ledger retrieval-ledger-YYYY-MM-DD.json --expected-items <全部卡数，含基线卡> --expected-sections <板块总数> --expected-related <紧凑关联卡数> --expected-unique-events <唯一事件数> --expected-cross-section <跨板块完整卡数> --expected-baseline <基线卡数>
+python scripts/mark_success.py --subscription-id primary --timezone Asia/Shanghai --state-dir .zhixun-state --html-file daily-industry-brief-YYYY-MM-DD.html --ledger-file retrieval-ledger-YYYY-MM-DD.json
 ```
 
-验证失败时不能把该次运行标记为成功。
+任一验证失败时不能把该次运行标记为成功。
 
 ### 4. 定时和补发
 
@@ -212,6 +235,7 @@ generate-daily-industry-brief/
 │   ├── retrieval-routing.md          # 检索路由
 │   ├── retrieval-audit.md            # 覆盖、核验和排除审计
 │   ├── runtime-compatibility.md       # 多 Agent 能力检测与降级策略
+│   ├── network-retrieval-playbook.md  # 无 WebSearch 时的联网检索与补检规则
 │   └── news-input-schema.json        # 外部结构化新闻数据格式
 └── scripts/
     ├── launch_selector.py            # 本地交互选择器桥接
@@ -219,6 +243,8 @@ generate-daily-industry-brief/
     ├── verify_schedule.py            # 时区、首跑和循环规则检查
     ├── validate_html.py              # HTML 功能检查
     ├── validate_news_input.py        # 外部新闻输入检查
+    ├── validate_retrieval_ledger.py  # 逐候选检索台账检查
+    ├── probe_network.py               # 可选的只读联网能力探测
     ├── check_catchup.py              # 同日漏跑判断
     └── mark_success.py               # 成功标记与去重
 ```
@@ -241,8 +267,8 @@ Reference 文件按任务阶段加载：选择板块时不需要一次性读取�
 
 ## 版本与兼容性
 
-- Skill 版本：`1.9.8`
-- 核心规则版本：`4.22`
+- Skill 版本：`1.30.0`
+- 核心规则版本：`4.69`
 - Python：`3.6+`
 - 输出语言：`zh-CN`
 - 默认时区：`Asia/Shanghai`

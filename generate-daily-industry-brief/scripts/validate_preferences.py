@@ -44,6 +44,12 @@ ALIASES = {
 NAME_TO_ID = {**{name: topic_id for topic_id, name in TOPICS.items()}, **ALIASES}
 MAX_CUSTOM_INTERESTS = 20
 MAX_CUSTOM_INTEREST_LENGTH = 50
+PROFILE_DEFAULTS = {
+    "management": {"fintech": 8, "sourcing": 7, "matching": 8, "employment": 5, "overseas": 7, "leadership": 9, "enterprise": 10, "capital": 10, "digital": 7, "informatization": 6, "construction-tech": 6, "government": 7, "industry-data": 8, "standards": 5, "green": 6, "extended": 7},
+    "production": {"fintech": 4, "sourcing": 10, "matching": 8, "employment": 10, "overseas": 4, "leadership": 4, "enterprise": 6, "capital": 3, "digital": 6, "informatization": 7, "construction-tech": 8, "government": 6, "industry-data": 7, "standards": 8, "green": 7, "extended": 5},
+    "research": {"fintech": 5, "sourcing": 4, "matching": 4, "employment": 5, "overseas": 6, "leadership": 6, "enterprise": 7, "capital": 7, "digital": 7, "informatization": 6, "construction-tech": 7, "government": 10, "industry-data": 10, "standards": 10, "green": 8, "extended": 9},
+    "custom": {topic_id: 5 for topic_id in TOPICS},
+}
 
 
 def read_config(path):
@@ -79,6 +85,30 @@ def normalize_custom_interests(value):
     return normalized
 
 
+def normalize_profile(data, topic_ids):
+    profile = str(data.get("user_profile", "custom"))
+    if profile not in PROFILE_DEFAULTS:
+        raise ValueError("user_profile must be management, production, research, or custom")
+    raw_scores = data.get("topic_relevance", {})
+    if raw_scores is None:
+        raw_scores = {}
+    if not isinstance(raw_scores, dict):
+        raise ValueError("topic_relevance must be an object")
+    unknown = [str(key) for key in raw_scores if str(key) not in TOPICS]
+    if unknown:
+        raise ValueError("unknown topic_relevance keys: %s" % ", ".join(unknown))
+    scores = dict(PROFILE_DEFAULTS[profile])
+    for topic_id, value in raw_scores.items():
+        try:
+            score = int(value)
+        except (TypeError, ValueError):
+            raise ValueError("topic relevance must be an integer from 1 to 10")
+        if not 1 <= score <= 10:
+            raise ValueError("topic relevance must be an integer from 1 to 10")
+        scores[str(topic_id)] = score
+    return profile, {topic_id: scores[topic_id] for topic_id in TOPICS}
+
+
 def normalize(data):
     raw_ids = data.get("topic_ids")
     raw_names = data.get("topics")
@@ -99,7 +129,7 @@ def normalize(data):
     topic_ids = list(dict.fromkeys(topic_ids))
     version = str(data.get("version", ""))
     legacy_names = {str(value) for value in raw_names} if isinstance(raw_names, list) else set()
-    if "digital" in topic_ids and "fintech" not in topic_ids and ({"AI与数科", "AI数科"} & legacy_names or not version.startswith(("4.12", "4.13", "4.14", "4.15", "4.16", "4.17", "4.18", "4.19", "4.20", "4.21", "4.22"))):
+    if "digital" in topic_ids and "fintech" not in topic_ids and ({"AI与数科", "AI数科"} & legacy_names or not version.startswith(("4.12", "4.13", "4.14", "4.15", "4.16", "4.17", "4.18", "4.19", "4.20", "4.21", "4.22", "4.23", "4.24", "4.25", "4.26"))):
         topic_ids.insert(0, "fintech")
     unknown = [topic_id for topic_id in topic_ids if topic_id not in TOPICS]
     if unknown:
@@ -109,6 +139,7 @@ def normalize(data):
     custom_interests = normalize_custom_interests(data.get("custom_interests"))
     if not topic_ids and not custom_interests:
         raise ValueError("choose a standard topic or add a custom interest")
+    user_profile, topic_relevance = normalize_profile(data, topic_ids)
 
     max_items = int(data.get("max_items_per_topic", 20))
     if not 1 <= max_items <= 20:
@@ -137,12 +168,15 @@ def normalize(data):
     )
 
     normalized = {
-        "version": "4.22",
+        "version": "4.26",
         "subscription_id": subscription_id,
         "update_existing": bool(data.get("update_existing", True)),
         "topics": [TOPICS[topic_id] for topic_id in topic_ids],
         "topic_ids": topic_ids,
         "custom_interests": custom_interests,
+        "user_profile": user_profile,
+        "topic_relevance": topic_relevance,
+        "coverage_policy": "continuity-with-transparent-baseline",
         "industry_scope": "建筑与建筑科技生态",
         "cadence": cadence,
         "delivery_time": delivery_time,

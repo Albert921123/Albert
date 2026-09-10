@@ -2,9 +2,9 @@
   "schema": "https://agentskills.io/specification",
   "name": "generate-daily-industry-brief",
   "distribution": "universal",
-  "distribution_version": "1.9.8",
-  "core_version": "4.22",
-  "python_compatibility": ">=3.6",
+  "distribution_version": "1.30.0",
+  "core_version": "4.69",
+  "python_compatibility": "optional >=3.6",
   "entrypoint": "SKILL.md",
   "language": "zh-CN",
   "install_targets": {
@@ -18,8 +18,13 @@
   "optional_capabilities": [
     "local-python",
     "local-browser",
+    "user-authorized-cloud-browser-or-desktop",
+    "search-api-or-tool",
     "web-search",
     "direct-url-fetch",
+    "http-client",
+    "rss-or-public-listing",
+    "site-native-search",
     "external-json-input",
     "html-search-validator",
     "native-scheduler"
@@ -32,11 +37,21 @@
     "references/section-source-catalog.md",
     "references/discovery-source-ladder.md",
     "references/runtime-compatibility.md",
+    "references/network-retrieval-playbook.md",
+    "references/role-profiles.md",
+    "references/coverage-continuity.md",
+    "references/anti-shortcut-execution.md",
     "references/retrieval-audit.md",
     "references/retrieval-routing.md",
+    "references/editorial-standard.md",
+    "references/macro-editorial-architecture.md",
     "scripts/verify_install.py",
     "scripts/py36_compat.py",
     "scripts/validate_news_input.py",
-    "scripts/validate_html.py"
+    "scripts/validate_retrieval_ledger.py",
+    "scripts/probe_network.py",
+    "scripts/validate_html.py",
+    "scripts/create_reading_receipt.py",
+    "scripts/verify_reading_receipt.py"
   ]
 }

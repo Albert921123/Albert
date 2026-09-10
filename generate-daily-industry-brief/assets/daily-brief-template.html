@@ -8,11 +8,60 @@
   <style>
     :root{--ink:#17201d;--muted:#66716c;--paper:#f4f1ea;--card:#fffdfa;--green:#174f3d;--green-2:#0f3d2f;--orange:#d7663f;--line:#d8d2c7;--mobile-topbar-height:0px;--mobile-nav-height:49px;--serif:"Noto Serif SC","Songti SC",SimSun,serif;--sans:Inter,"Microsoft YaHei","PingFang SC",sans-serif}
     *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.7;overflow:hidden}button,input{font:inherit}a{color:var(--green);text-underline-offset:3px}a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--orange);outline-offset:3px}.app-shell{height:100vh;display:flex;flex-direction:column;overflow:hidden}.topbar{position:relative;z-index:10;flex:0 0 auto;background:var(--green);color:#fff;box-shadow:0 8px 24px rgba(15,35,28,.14)}.topbar-inner{width:min(1440px,100%);margin:auto;padding:12px 30px 10px}.topline{display:grid;grid-template-columns:minmax(180px,240px) minmax(0,1fr) minmax(260px,360px);align-items:start;gap:22px}.brand-kicker{margin:0 0 2px;color:#f1b799;font-size:9px;letter-spacing:.14em}.brand h1{margin:0;font:700 clamp(28px,3vw,42px)/1 var(--serif)}.runline{margin:5px 0 0;color:rgba(255,255,255,.68);font-size:10px}.highlights{min-width:0}.highlights-label{margin:0 0 5px;color:#f1b799;font-size:10px;font-weight:700;letter-spacing:.14em}.highlights ol{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:0;padding:0;list-style:none}.highlights a{display:block;min-height:48px;padding:6px 9px;background:rgba(0,0,0,.14);border:1px solid rgba(255,255,255,.15);color:#fff;text-decoration:none;font-size:13px;line-height:1.4}.highlights a:hover{background:rgba(0,0,0,.23)}.business-type{display:block;margin-bottom:2px;color:#f1b799;font-size:9.5px;font-weight:700;letter-spacing:.08em}.search-box{align-self:center}.search-label{display:block;margin:0 0 5px;color:rgba(255,255,255,.72);font-size:9px;letter-spacing:.08em}.search-control{display:flex;background:#fff;border:1px solid rgba(255,255,255,.4)}.search-control input{width:100%;min-width:0;border:0;background:transparent;padding:8px 10px;color:var(--ink);outline:0}.search-control button{display:none;border:0;border-left:1px solid var(--line);background:#fff;color:var(--muted);padding:0 10px;cursor:pointer}.search-control button.show{display:block}.search-status{min-height:14px;margin:3px 0 0;color:rgba(255,255,255,.7);font-size:9px}.meta{display:flex;gap:16px;flex-wrap:wrap;margin-top:7px;padding-top:6px;border-top:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.68);font-size:11px}.meta strong{color:#fff;font-weight:600}.reading-frame{min-height:0;display:grid;grid-template-columns:260px minmax(0,1fr);flex:1}.sidebar{min-height:0;background:#ebe7dd;border-right:1px solid var(--line);overflow-y:auto;padding:24px 20px 30px}.nav-kicker{margin:0;color:var(--orange);font-size:10px;font-weight:700;letter-spacing:.16em}.sidebar h2{margin:3px 0 16px;font:700 24px/1.2 var(--serif)}.topic-nav{display:grid;gap:5px}.topic-nav a{display:grid;grid-template-columns:24px 1fr;gap:8px;align-items:center;padding:9px 10px;border-left:3px solid transparent;color:var(--ink);text-decoration:none;font-size:12px}.topic-nav a:hover{background:rgba(255,255,255,.58)}.topic-nav a.active{border-left-color:var(--orange);background:var(--card);color:var(--green);font-weight:700}.nav-number{color:var(--muted);font-size:9px}.sidebar-summary{margin-top:22px;padding-top:17px;border-top:1px solid var(--line);color:var(--muted);font-size:11px}.sidebar-summary strong{display:block;color:var(--ink);font-size:13px}.content-scroll{min-width:0;min-height:0;overflow-y:auto;overscroll-behavior:contain;scroll-behavior:smooth}.content-inner{width:min(1040px,calc(100% - 48px));margin:0 auto;padding:30px 0 0}.section{scroll-margin-top:28px;margin:0 0 42px}.section[hidden],.story[hidden]{display:none}.section-head{display:none;align-items:end;justify-content:space-between;gap:20px;border-bottom:2px solid var(--ink);padding-bottom:12px}.section-head h2{margin:0;font:700 31px/1.2 var(--serif)}.section-head span{color:var(--muted);font-size:12px}.story{scroll-margin-top:28px;background:var(--card);border:1px solid var(--line);margin-top:16px;padding:26px 28px 26px 110px;position:relative}.story::before{content:attr(data-story-section);position:absolute;top:27px;left:20px;display:inline-block;max-width:76px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;font-weight:700;line-height:1.3;letter-spacing:.04em;color:var(--green);background:#e7efe9;border:1px solid #c6d6cc;border-radius:999px;padding:3px 9px}.story.section-name-hit::before{background:#ffe3a3;color:var(--ink);border-color:#d6a84c}.search-hit{background:#ffe3a3;color:inherit;border-radius:2px;padding:0 1px}.story-index{color:var(--orange);font-weight:700;font-size:11px;letter-spacing:.12em}.freshness-badge{display:inline-block;margin-left:7px;padding:2px 7px;border-radius:999px;background:#f7e2d8;color:#9a431f;font-size:10px;font-weight:700;letter-spacing:0}.story h3{margin:8px 0 18px;font:700 23px/1.45 var(--serif)}.story dl{display:grid;grid-template-columns:110px 1fr;gap:9px 18px;margin:0}.story dt{color:var(--muted);font-size:12px;font-weight:700}.story dd{margin:0}.source{margin:18px 0 0;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-size:12px}.source a::after{content:" ↗"}.judgement{border-left:3px solid var(--orange);padding-left:13px}.empty{background:rgba(255,255,255,.52);border:1px dashed #aaa49a;color:var(--muted);margin-top:16px;padding:28px;text-align:center}.no-results{display:none;margin:20px 0 40px;padding:34px;border:1px dashed #aaa49a;background:rgba(255,255,255,.48);color:var(--muted);text-align:center}.no-results.show{display:block}.signals{scroll-margin-top:28px;background:var(--ink);color:#fff;padding:32px;margin:54px 0}.signals h2{margin:0 0 14px;font:700 27px/1.2 var(--serif)}.signals li+li{margin-top:9px}.foot{border-top:1px solid var(--line);padding:24px 0 44px;color:var(--muted);font-size:11px}
-    .empty strong{display:block;margin-bottom:5px;color:var(--ink)}.empty.section-name-hit{background:#fff0c7;border-color:#d6a84c;color:var(--ink)}.empty.limited{background:#fff4e8;border-color:#d79a72;color:#76513d}.empty.limited strong{color:#9a431f}.related-evidence{margin-top:16px;padding:18px 20px;background:#eef3ef;border:1px solid #c8d7ce}.related-evidence strong{display:block;color:var(--green);font-size:12px}.related-evidence p{margin:6px 0 0}.related-evidence .source{margin-top:10px;padding-top:9px}.coverage-audit{margin:0 0 38px;border:1px solid var(--line);background:rgba(255,255,255,.58)}.coverage-audit summary{cursor:pointer;padding:15px 18px;color:var(--green);font-weight:700}.coverage-audit[open] summary{border-bottom:1px solid var(--line)}.audit-body{padding:16px 18px 20px}.audit-summary{margin:0 0 13px;color:var(--muted);font-size:12px}.audit-grid{display:grid;grid-template-columns:minmax(120px,1.4fr) repeat(5,minmax(62px,.65fr));gap:1px;background:var(--line);border:1px solid var(--line);font-size:11px}.audit-grid>*{background:var(--card);padding:7px 9px}.audit-head{font-weight:700;color:var(--green)}.audit-status-limited{color:#9a431f;font-weight:700}.audit-reasons{margin:13px 0 0;color:var(--muted);font-size:11px}
+    .empty strong{display:block;margin-bottom:5px;color:var(--ink)}.empty.section-name-hit{background:#fff0c7;border-color:#d6a84c;color:var(--ink)}.empty.limited{background:#fff4e8;border-color:#d79a72;color:#76513d}.empty.limited strong{color:#9a431f}.baseline-card{border-left:4px solid #90784d;background:#fffcf3}.baseline-card::before{background:#f4ead0;color:#6d5528;border-color:#d9c48d}.baseline-badge{display:inline-block;margin-left:7px;padding:2px 7px;border-radius:999px;background:#f4ead0;color:#6d5528;font-size:10px;font-weight:700}.candidate-exclusions{margin:14px auto 0;max-width:820px;padding-left:22px;text-align:left;color:var(--ink)}.candidate-exclusion+ .candidate-exclusion{margin-top:7px}.candidate-exclusion time{color:var(--muted);font-size:11px}.cross-section-story{border-left:4px solid #648a75;background:#fbfdfb}.cross-section-badge,.relevance-badge{display:inline-block;margin-left:7px;padding:2px 7px;border-radius:999px;background:#e7efe9;color:var(--green);font-size:10px;font-weight:700}.related-evidence{margin-top:16px;padding:18px 20px;background:#eef3ef;border:1px solid #c8d7ce}.related-evidence strong{display:block;color:var(--green);font-size:12px}.related-evidence p{margin:6px 0 0}.related-evidence .source{margin-top:10px;padding-top:9px}.coverage-audit{margin:0 0 38px;border:1px solid var(--line);background:rgba(255,255,255,.58)}.coverage-audit summary{cursor:pointer;padding:15px 18px;color:var(--green);font-weight:700}.coverage-audit[open] summary{border-bottom:1px solid var(--line)}.audit-body{padding:16px 18px 20px}.audit-summary{margin:0 0 13px;color:var(--muted);font-size:12px}.audit-grid{display:grid;grid-template-columns:minmax(120px,1.4fr) repeat(6,minmax(62px,.65fr));gap:1px;background:var(--line);border:1px solid var(--line);font-size:11px}.audit-grid>*{background:var(--card);padding:7px 9px}.audit-head{font-weight:700;color:var(--green)}.audit-status-limited{color:#9a431f;font-weight:700}.audit-section-detail{margin:8px 0 14px;border:1px solid var(--line);background:#fbfaf6}.audit-section-detail summary{padding:8px 10px;color:var(--green);font-size:11px;font-weight:700}.audit-section-detail[open] summary{border-bottom:1px solid var(--line)}.audit-section-detail>div{padding:9px 11px;color:var(--muted);font-size:11px}.audit-section-detail p{margin:0 0 5px}.audit-section-detail p:last-child{margin-bottom:0}.audit-reasons{margin:13px 0 0;color:var(--muted);font-size:11px}
     @media(max-width:1080px){.topline{grid-template-columns:200px 1fr}.search-box{grid-column:1/-1}.search-label{display:none}.search-status{margin-bottom:-5px}.highlights ol{grid-template-columns:repeat(3,minmax(180px,1fr));overflow-x:auto}.reading-frame{grid-template-columns:220px minmax(0,1fr)}}
     @media(max-width:720px){body{overflow:auto;-webkit-overflow-scrolling:touch}.app-shell{height:auto;min-height:100vh;overflow:visible}.topbar{position:sticky;top:0;z-index:30}.topbar-inner{padding:calc(14px + env(safe-area-inset-top,0px)) max(14px,env(safe-area-inset-right,0px)) 12px max(14px,env(safe-area-inset-left,0px))}.topline{display:block}.brand{display:flex;align-items:end;justify-content:space-between;gap:14px}.brand-kicker{display:none}.brand h1{font-size:28px}.runline{margin:0}.highlights{display:none}.search-box{margin-top:10px}.meta{display:none}.reading-frame{display:block}.sidebar{position:sticky;top:var(--mobile-topbar-height);z-index:20;min-height:0;height:var(--mobile-nav-height);overflow-x:auto;overflow-y:hidden;padding:6px max(12px,env(safe-area-inset-right,0px)) 5px max(12px,env(safe-area-inset-left,0px));border-right:0;border-bottom:1px solid var(--line);background:rgba(235,231,221,.98);box-shadow:0 5px 14px rgba(23,32,29,.12);scrollbar-width:none;-webkit-overflow-scrolling:touch}.sidebar::-webkit-scrollbar{display:none}.sidebar h2,.nav-kicker,.sidebar-summary{display:none}.topic-nav{display:flex;width:max-content;min-width:100%;height:100%;align-items:stretch}.topic-nav a{display:flex;align-items:center;padding:5px 11px;border-left:0;border-bottom:2px solid transparent;white-space:nowrap}.topic-nav a.active{border-left:0;border-bottom-color:var(--orange)}.nav-number{display:none}.content-scroll{overflow:visible}.content-inner{width:min(100% - 24px,1040px);padding-top:22px}.section,.signals{scroll-margin-top:calc(var(--mobile-topbar-height) + var(--mobile-nav-height) + 12px)}.story{padding:21px 18px;padding-left:18px}.story::before{position:static;top:auto;left:auto;display:inline-block;max-width:none;margin:0 0 10px}.story dl{grid-template-columns:1fr;gap:2px}.story dd+dt{margin-top:10px}.section-head{display:flex;align-items:start;flex-direction:column}.section-head h2{font-size:27px}}
     @media(max-width:720px){.audit-body{overflow-x:auto}.audit-grid{min-width:620px}}
     @media print{body,.app-shell{height:auto;overflow:visible;background:#fff}.topbar{position:static;background:#fff;color:#000;box-shadow:none}.brand-kicker,.runline,.meta,.search-box{color:#555}.highlights a{color:#000;background:#fff;border-color:#bbb}.business-type{color:#555}.reading-frame{display:block}.sidebar{display:none}.content-scroll{overflow:visible}.content-inner{width:100%;padding:18px 0}.story{break-inside:avoid}.signals{background:#fff;color:#000;border:2px solid #000}}
+    /* v1.18.2: keep the business-priority cards compact, legible and visually grouped. */
+    .topbar-inner{padding:10px 30px 8px}
+    .topline{grid-template-columns:minmax(175px,225px) minmax(0,1fr) minmax(250px,340px);align-items:stretch;gap:18px}
+    .brand{padding-top:2px}.highlights{padding-top:1px}.highlights-label{margin-bottom:6px}
+    .highlights ol{gap:9px}.highlights a{min-height:76px;padding:9px 11px;border-color:rgba(255,255,255,.18);line-height:1.45;transition:background .15s ease,border-color .15s ease}.highlights a:hover{background:rgba(0,0,0,.25);border-color:rgba(255,255,255,.34)}.business-type{margin-bottom:4px}
+    @media(max-width:1080px){.topline{grid-template-columns:200px 1fr}.highlights a{min-height:70px}}
+    /* Keep the audit disclosure out of the seven-column data grid. Each row wrapper
+       becomes seven aligned cells, so a generator cannot collapse counts into text. */
+    .audit-grid>[data-audit-row]{display:contents}
+    .audit-grid>[data-audit-row]>span{display:block;min-width:0;background:var(--card);padding:7px 9px;overflow-wrap:anywhere}
+    .audit-grid>[data-audit-row]>span:last-child{font-weight:700;color:var(--green)}
+    .audit-grid>.audit-head{background:var(--card);padding:7px 9px}
+    @media(max-width:720px){.audit-grid>[data-audit-row]>span{padding:8px 9px}}
+    /* v1.19.3: compact three-card priority strip and management-facing signal card. */
+    .topbar-inner{max-width:1440px}
+    .topline{grid-template-columns:minmax(190px,230px) minmax(540px,620px) minmax(280px,340px);justify-content:space-between;gap:18px}
+    .highlights{width:100%;max-width:620px;padding-top:2px}
+    .highlights ol{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+    .highlights a{min-height:58px;padding:8px 10px;font-size:12px;line-height:1.45;overflow-wrap:normal;word-break:normal}
+    .business-type{margin-bottom:3px;font-size:9px}
+    .signals{background:var(--card);color:var(--ink);border:1px solid var(--line);border-left:5px solid var(--green);box-shadow:none;padding:26px 30px}
+    .signals h2{color:var(--green);font-size:25px}.signals ul{margin:0;padding-left:21px}.signals li{padding-left:2px}.signals a{color:var(--green);font-weight:700;text-decoration-color:#a4bcae}
+    @media(max-width:1260px){.topline{grid-template-columns:210px minmax(0,1fr) 310px}.highlights{max-width:none}.highlights a{min-height:62px}}
+    @media(max-width:1080px){.topline{grid-template-columns:200px 1fr}.highlights{max-width:none}.search-box{grid-column:1/-1}}
+    @media(max-width:720px){.highlights{display:none}.signals{padding:22px 18px;border-left-width:4px}.signals h2{font-size:24px}}
+    /* v1.19.4: leadership desktop header — brand / broad three-card focus / search. */
+    .topbar-inner{width:min(1800px,100%);max-width:none;padding:10px 30px 9px}
+    .topline{grid-template-columns:minmax(260px,320px) minmax(720px,1fr) minmax(370px,430px);justify-content:normal;gap:20px}
+    .highlights{max-width:none;width:auto}.highlights ol{gap:10px}
+    .highlights a{min-height:108px;padding:9px 12px;font-size:13px;line-height:1.45;overflow-wrap:break-word}
+    .business-type{font-size:10px;margin-bottom:4px}
+    @media(max-width:1500px){.topline{grid-template-columns:minmax(220px,270px) minmax(600px,1fr) minmax(320px,370px)}.highlights a{min-height:92px}}
+    @media(max-width:1080px){.topline{grid-template-columns:200px 1fr}.search-box{grid-column:1/-1}.highlights a{min-height:70px}}
+    /* v1.21.0: readable search controls plus evidence-chain management view. */
+    .search-box{padding-top:15px}.search-label{margin-bottom:8px;font-size:15px;font-weight:700;line-height:1.45}.search-control input{min-height:46px;padding:10px 12px;font-size:16px}.search-status{margin-top:12px;font-size:14px;line-height:1.55}
+    .management-map{margin:0 0 30px;padding:26px;background:#f4f1e9;border:1px solid #d9d3c6;scroll-margin-top:28px}.management-map-head{display:flex;align-items:end;justify-content:space-between;gap:28px;margin:0 0 18px}.management-map h2{margin:2px 0 0;color:var(--green);font:700 28px/1.2 var(--serif)}.eyebrow{margin:0;color:var(--orange);font-size:11px;font-weight:800;letter-spacing:.11em}.management-map-head>p{max-width:520px;margin:0;color:#53645d;font-size:14px;line-height:1.7}.chain-card{margin:12px 0 0;background:var(--card);border:1px solid var(--line);padding:18px 20px}.chain-card:first-of-type{margin-top:0}.chain-title{display:flex;align-items:baseline;gap:13px;flex-wrap:wrap;border-bottom:1px solid #e3ded5;padding-bottom:10px}.chain-title>span{color:var(--orange);font-size:12px;font-weight:800;letter-spacing:.08em}.chain-title h3{margin:0;color:var(--green);font-size:19px;line-height:1.4}.chain-status{margin:0 0 0 auto;color:#68786f;font-size:12px}.chain-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;list-style:none;margin:15px 0 13px;padding:0}.chain-steps li{position:relative;min-height:100px;padding:13px 14px 12px;background:#f7f8f4;border-left:3px solid #6b927d}.chain-steps li:not(:last-child)::after{content:"→";position:absolute;right:-12px;top:40px;z-index:1;color:var(--orange);font-size:18px;font-weight:700}.chain-steps b{display:block;color:var(--orange);font-size:12px;margin-bottom:5px}.chain-steps a{display:block;color:#175b46;font-size:14px;font-weight:800;line-height:1.45;text-decoration:none}.chain-steps a:hover{text-decoration:underline}.chain-steps small{display:block;margin-top:6px;color:#485850;font-size:12px;line-height:1.55}.chain-action{margin:0;padding:11px 13px;background:#e9f0eb;color:#32463c;font-size:14px;line-height:1.75}.chain-action strong{color:#175b46}.chain-card-caveat{border-left:4px solid #c9834d}.chain-card-caveat .chain-steps li{border-left-color:#c9834d}.management-actions{background:#f6f4ed;color:#243a30;border:1px solid #d9d3c6;border-left:5px solid var(--green);box-shadow:none}.management-actions h2{color:var(--green)}.management-actions li{color:#32463c;line-height:1.85}.management-actions strong,.management-actions a{color:#175b46}
+    @media(max-width:900px){.management-map-head{display:block}.management-map-head>p{margin-top:10px}.chain-status{margin:4px 0 0}.chain-steps{grid-template-columns:1fr}.chain-steps li{min-height:0}.chain-steps li:not(:last-child)::after{content:"↓";right:auto;left:17px;top:auto;bottom:-21px}.management-map{padding:19px 16px}}
+    @media(max-width:720px){.search-box{padding-top:13px}.search-label{display:block;font-size:13px}.search-status{font-size:12px}.management-actions{padding:22px 18px;border-left-width:4px}}
+    /* v1.26.0: compact header, grouped navigation, and fact-only reader recommendations. */
+    .topbar-inner{padding:8px 26px 7px}
+    .topline{grid-template-columns:minmax(235px,280px) minmax(0,1fr) minmax(300px,340px);gap:16px;align-items:start}
+    .highlights{padding-top:0}.highlights-label{margin-bottom:5px}.highlights ol{gap:8px}.highlights a{min-height:68px;padding:8px 10px;font-size:13px;line-height:1.42}
+    .search-box{padding-top:42px}.highlights-label,.search-label{display:flex;align-items:center;height:20px;margin:0 0 6px}.highlights-label{justify-content:center;text-align:center}.search-label{justify-content:flex-start}.search-control input{min-height:48px;padding:8px 11px;font-size:15px}.search-status{min-height:20px;margin-top:6px;font-size:12px}
+    .meta{margin-top:8px;padding-top:7px;font-size:11px}
+    .topic-nav{display:block}.nav-featured{margin-bottom:12px;background:var(--card);border-left-color:var(--orange)!important;color:var(--green)!important;font-weight:700}.nav-group{display:grid;gap:2px;margin:0 0 12px}.nav-group-title{margin:6px 10px 3px;color:var(--orange);font-size:10px;font-weight:800;letter-spacing:.12em}.nav-group .topic-nav-link{padding-top:7px;padding-bottom:7px}.nav-group .nav-number{font-size:9px}
+    .highlights ol{margin:0;padding:0;list-style:none}.highlights ol>li{margin:0;padding:0;list-style:none}.management-map .chain-card{padding:16px 18px}.management-map .chain-title{padding-bottom:9px}.management-map .chain-title>span{font-size:11px}.management-map .chain-status{font-size:12px}.management-map .chain-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:13px 0 0;padding:0;gap:12px;list-style:none}.management-map .chain-steps li{min-height:0;padding:11px 12px;background:#f2f6f1;border-left:3px solid #6b927d}.management-map .chain-steps li:not(:last-child)::after{content:none}.management-map .chain-steps b{margin-bottom:4px}.management-map .chain-steps a{font-size:14px}.management-map .chain-steps small{margin-top:5px}.chain-note{margin:12px 0 0;padding:10px 12px;background:#e9f0eb;color:#32463c;font-size:14px;line-height:1.7}.chain-note strong{color:#175b46}.management-map-head>p{max-width:560px}
+    @media(max-width:1500px){.topline{grid-template-columns:minmax(220px,260px) minmax(0,1fr) minmax(290px,320px)}.highlights a{min-height:68px}}
+    @media(max-width:1080px){.topline{grid-template-columns:200px minmax(0,1fr)}.search-box{grid-column:1/-1;padding-top:0}}
+    @media(max-width:720px){.topbar-inner{padding:calc(14px + env(safe-area-inset-top,0px)) max(14px,env(safe-area-inset-right,0px)) 12px max(14px,env(safe-area-inset-left,0px))}.nav-featured{margin:0}.topic-nav{display:flex}.nav-group{display:contents}.nav-group-title{display:none}.nav-group .topic-nav-link{padding:5px 11px}.management-map .chain-card{padding:15px}.management-map .chain-steps{grid-template-columns:1fr}.management-map-head>p{font-size:13px}}
   </style>
 </head>
 <body>
@@ -63,10 +112,23 @@
         <p class="nav-kicker">CONTENTS</p>
         <h2>本期板块</h2>
         <nav class="topic-nav" id="topic-nav" aria-label="板块导航">
-          <!-- Repeat for every selected standard/custom section: -->
-          <a href="#topic-id"><span class="nav-number">01</span><span>{{TOPIC_NAME}}</span></a>
-          <!-- End repeat. -->
-          <a href="#today-signals"><span class="nav-number">↗</span><span>今日信号</span></a>
+          <a class="nav-featured" href="#management-map"><span class="nav-number">↗</span><span>今日推荐关注</span></a>
+          <!-- Render a nav-group only when it contains selected sections. Keep the groups
+               below; custom interests retain their exact label under 自定义关注. -->
+          <div class="nav-group"><p class="nav-group-title">业务与市场</p>
+            <!-- 数科、寻源、撮合、用工、海外、高管观点、企业经营、投融资 -->
+            <a class="topic-nav-link" href="#topic-id"><span class="nav-number">01</span><span>{{TOPIC_NAME}}</span></a>
+          </div>
+          <div class="nav-group"><p class="nav-group-title">技术与生态</p>
+            <!-- AI、建筑软件、建筑科技 -->
+          </div>
+          <div class="nav-group"><p class="nav-group-title">政策与行业</p>
+            <!-- 政府宏观、行业数据、标准规范、绿色低碳、拓展阅读 -->
+          </div>
+          <div class="nav-group"><p class="nav-group-title">自定义关注</p>
+            <!-- Repeat selected custom interests here. -->
+          </div>
+          <a class="topic-nav-link" href="#today-signals"><span class="nav-number">↗</span><span>管理动作</span></a>
         </nav>
         <div class="sidebar-summary"><strong>{{SELECTED_TOPICS}}</strong>当前共 {{SELECTED_TOPIC_COUNT}} 个关注板块</div>
       </aside>
@@ -75,23 +137,50 @@
         <div class="content-inner">
           <div class="no-results" id="no-results">没有找到匹配内容，请更换关键词或清空搜索。</div>
 
+          <!-- Render two or three three-segment recommendations only from independently
+               verified full cards in this issue. The segments are parallel evidence,
+               not a causal chain; do not list a section with no formal card. -->
+          <section class="management-map" id="management-map" aria-labelledby="management-map-title">
+            <div class="management-map-head"><div><p class="eyebrow">TODAY'S PICKS · 三类已核验线索</p><h2 id="management-map-title">今日推荐关注</h2></div><p>同一主题下并列展示三类来源卡，不表示它们存在因果关系；无正式来源的板块不进入本区。</p></div>
+            <!-- Repeat two or three themes. Every segment links to an already-rendered
+                 formal story card; use labels that describe the evidence, not causality. -->
+            <article class="chain-card">
+              <div class="chain-title"><span>推荐 {{RECOMMENDATION_NUMBER}}</span><h3>{{RECOMMENDATION_THEME:如算力需求、实施方案}}</h3><p class="chain-status">三类事实线索</p></div>
+              <ol class="chain-steps">
+                <li><b>{{SLOT_ONE_LABEL:公开信息}}</b><a href="#{{SLOT_ONE_STORY_ID}}">{{SLOT_ONE_TITLE}}</a><small>{{SLOT_ONE_FACT}}</small></li>
+                <li><b>{{SLOT_TWO_LABEL:行业或场景}}</b><a href="#{{SLOT_TWO_STORY_ID}}">{{SLOT_TWO_TITLE}}</a><small>{{SLOT_TWO_FACT}}</small></li>
+                <li><b>{{SLOT_THREE_LABEL:企业或项目}}</b><a href="#{{SLOT_THREE_STORY_ID}}">{{SLOT_THREE_TITLE}}</a><small>{{SLOT_THREE_FACT}}</small></li>
+              </ol>
+              <p class="chain-note"><strong>核验重点：</strong>{{RECOMMENDATION_CHECKPOINT}}</p>
+            </article>
+          </section>
+
           <!-- Repeat one section for every selected topic. -->
-          <section class="section" id="topic-id" data-section-name="{{TOPIC_NAME}}" data-section-kind="{{SECTION_KIND_ATTR:standard或custom}}" data-coverage-status="{{SECTION_STATUS:complete或checked-empty或limited}}" data-topic-name="{{TOPIC_NAME}}">
-            <div class="section-head"><h2>{{TOPIC_NAME}}</h2><span>{{SECTION_KIND:标准板块或自定义关注}} · {{TOPIC_ITEM_COUNT}} 条 · {{SECTION_WINDOW_LABEL:24小时内或48小时补充}}</span></div>
+          <section class="section" id="topic-id" data-section-name="{{TOPIC_NAME}}" data-section-kind="{{SECTION_KIND_ATTR:standard或custom}}" data-coverage-status="{{SECTION_STATUS:complete或checked-empty或limited或baseline}}" data-topic-name="{{TOPIC_NAME}}">
+            <div class="section-head"><h2>{{TOPIC_NAME}}</h2><span>{{SECTION_KIND:标准板块或自定义关注}} · {{TOPIC_ITEM_COUNT}} 张完整卡 · 其中跨板块 {{TOPIC_CROSS_SECTION_COUNT}} 张 · {{SECTION_WINDOW_LABEL:24小时内或48小时补充}}</span></div>
 
             <!-- Repeat article for qualifying items. Give every article a unique id used by 今日重点. -->
-            <article class="story" id="story-id" data-story-section="{{TOPIC_NAME}}" data-freshness-window="{{WINDOW_CLASS:primary-or-fallback}}">
-              <span class="story-index">01 / {{SOURCE_TIER}}</span><span class="freshness-badge">{{FRESHNESS_BADGE:24小时内或48小时补充}}</span>
+            <article class="story" id="story-id" data-event-id="{{UNIQUE_EVENT_ID}}" data-entry-kind="primary" data-story-section="{{TOPIC_NAME}}" data-freshness-window="{{WINDOW_CLASS:primary-or-fallback}}">
+              <span class="story-index">01 / {{SOURCE_TIER}}</span><span class="freshness-badge">{{FRESHNESS_BADGE:24小时内或48小时补充}}</span><span class="relevance-badge">{{RELEVANCE_LABEL:直接相关或产业链关联或行业影响}}</span>
               <h3>{{TITLE}}</h3>
               <dl>
                 <dt>发生了什么</dt><dd>{{FACT_SUMMARY}}</dd>
                 <dt>为何值得关注</dt><dd>{{BUSINESS_RELEVANCE}}</dd>
+                <dt>行动/风险点</dt><dd>{{ACTION_OR_RISK}}</dd>
                 <dt>研判</dt><dd class="judgement">{{INFERENCE_OR_OMIT_ROW}}</dd>
               </dl>
               <p class="source">来源：<a href="{{DIRECT_URL}}" target="_blank" rel="noopener noreferrer">{{SOURCE_NAME}}</a> · <time datetime="{{ISO_TIMESTAMP}}">{{DISPLAY_TIMESTAMP}}</time></p>
             </article>
 
-            <!-- Optional: use when a story is rendered in another primary section but materially informs this section. Do not count as another story. -->
+            <!-- For continuity coverage without a qualifying 48-hour event, use this baseline card only. -->
+            <article class="story baseline-card" id="baseline-id" data-event-id="baseline-{{TOPIC_NAME}}" data-entry-kind="baseline" data-story-section="{{TOPIC_NAME}}" data-freshness-window="baseline">
+              <p class="story-index">基线追踪 <span class="baseline-badge">非当日新闻，不计入正式资讯</span></p>
+              <h3>{{BASELINE_TITLE}}</h3>
+              <dl><dt>本次覆盖</dt><dd>{{CAPABILITY_AND_COVERAGE_NOTE}}</dd><dt>持续关注</dt><dd>{{NEXT_WATCHLIST}}</dd><dt>为何保留</dt><dd>{{SECTION_RELEVANCE_BRIDGE}}</dd></dl>
+              <p class="source">权威入口：<a href="{{BASELINE_SOURCE_URL}}" target="_blank" rel="noopener noreferrer">{{BASELINE_SOURCE_NAME}}</a></p>
+            </article>
+
+            <!-- Optional only for a third or weaker relevant section after the two-section full-card cap. Do not count as a full section card. -->
             <aside class="related-evidence" data-related-section="{{TOPIC_NAME}}">
               <strong>关联资讯 · {{PRIMARY_TOPIC_NAME}}</strong>
               <p><a href="#story-id">{{TITLE}}</a>：{{RELATED_BUSINESS_BRIDGE}}</p>
@@ -99,26 +188,33 @@
             </aside>
 
             <!-- For checked-empty sections, omit article elements and use this card. -->
-            <div class="empty"><strong>已完成本板块检索</strong>已检查 {{SOURCE_FAMILY_COUNT}} 类一手来源，过去48小时暂无值得收录的新动态</div>
+            <div class="empty" data-empty-state="checked-empty"><strong>已完成本板块检索</strong>已检查 {{SOURCE_FAMILY_COUNT}} 类有效来源，过去48小时暂无合格的新动态
+              <ul class="candidate-exclusions">
+                <li class="candidate-exclusion"><strong>{{EXCLUDED_CANDIDATE_TITLE}}</strong> <time>{{EXCLUDED_CANDIDATE_DATE}}</time>：{{EXACT_EXCLUSION_REASON}}</li>
+              </ul>
+            </div>
 
             <!-- For limited sections, use this card instead of the normal empty state. -->
-            <div class="empty limited"><strong>检索受限</strong>本板块本次检索覆盖不足，不能判定暂无动态。{{LIMITATION_REASON}}</div>
+            <div class="empty limited" data-empty-state="limited"><strong>检索受限</strong>本板块本次检索覆盖不足，不能判定暂无动态。{{LIMITATION_REASON}}</div>
           </section>
 
-          <section class="signals" id="today-signals">
-            <h2>今日信号</h2>
-            <ul><!-- Two or three cross-section signals. --></ul>
+          <section class="signals management-actions" id="today-signals">
+            <p class="eyebrow">ACTION LIST · 从判断到跟踪</p>
+            <h2>管理层动作清单</h2>
+            <ul><!-- Two or three fact-grounded cross-section conclusions and next actions. --></ul>
           </section>
 
           <details class="coverage-audit" id="coverage-audit">
             <summary>检索审计 · {{COVERAGE_COMPLETE}}/{{SELECTED_TOPIC_COUNT}} 板块完成</summary>
             <div class="audit-body">
-              <p class="audit-summary">候选页面 {{CANDIDATES_OPENED}} 个 · 24小时内收录 {{PRIMARY_ITEM_COUNT}} 条 · 48小时补充 {{FALLBACK_ITEM_COUNT}} 条 · 排除 {{TOTAL_EXCLUDED}} 条</p>
+              <p class="audit-summary">独立事件 {{UNIQUE_EVENT_COUNT}} 个 · 完整板块卡 {{FULL_SECTION_CARD_COUNT}} 张 · 跨板块复用 {{CROSS_SECTION_CARD_COUNT}} 张 · 紧凑关联 {{RELATED_CARD_COUNT}} 张 · 候选页面 {{CANDIDATES_OPENED}} 个 · 48小时补充 {{FALLBACK_ITEM_COUNT}} 张 · 排除 {{TOTAL_EXCLUDED}} 条</p>
               <div class="audit-grid" role="table" aria-label="逐板块检索覆盖">
-                <div class="audit-head" role="columnheader">板块</div><div class="audit-head" role="columnheader">来源族</div><div class="audit-head" role="columnheader">候选</div><div class="audit-head" role="columnheader">主收录</div><div class="audit-head" role="columnheader">关联</div><div class="audit-head" role="columnheader">状态</div>
-                <!-- Repeat one six-cell row per selected standard/custom section. -->
-                <div role="cell">{{TOPIC_NAME}}</div><div role="cell">{{SOURCE_FAMILY_COUNT}}</div><div role="cell">{{TOPIC_CANDIDATES}}</div><div role="cell">{{TOPIC_ITEM_COUNT}}</div><div role="cell">{{TOPIC_RELATED_COUNT}}</div><div role="cell">{{COVERAGE_STATUS}}</div>
+                <div class="audit-head" role="columnheader">板块</div><div class="audit-head" role="columnheader">来源族</div><div class="audit-head" role="columnheader">候选</div><div class="audit-head" role="columnheader">独立卡</div><div class="audit-head" role="columnheader">跨板块</div><div class="audit-head" role="columnheader">紧凑关联</div><div class="audit-head" role="columnheader">状态</div>
+                <!-- Repeat exactly one audit row and non-empty detail disclosure per selected section. -->
+                <div data-audit-row="{{SECTION_ID}}" role="row"><span>{{SECTION_LABEL}}</span><span>{{SOURCE_FAMILY_COUNT}}</span><span>{{CANDIDATE_COUNT}}</span><span>{{PRIMARY_CARD_COUNT}}</span><span>{{CROSS_SECTION_CARD_COUNT}}</span><span>{{RELATED_COUNT}}</span><span>{{SECTION_STATUS}}</span></div>
               </div>
+              <details class="audit-section-detail"><summary>{{SECTION_LABEL}}：来源与入选依据</summary><div><p>已检查来源族：{{CHECKED_SOURCE_FAMILIES}}</p><p>入选资讯：{{INCLUDED_CARD_TITLES}}</p><p>状态说明：{{SECTION_STATUS_REASON}}</p></div></details>
+              {{AUDIT_ROWS}}
               <p class="audit-reasons">排除原因：{{EXCLUSION_REASON_SUMMARY}}</p>
             </div>
           </details>
@@ -137,7 +233,7 @@
       const noResults = document.getElementById('no-results');
       const sections = [...document.querySelectorAll('.section')];
       const stories = [...document.querySelectorAll('.story')];
-      const searchableUnits = [...document.querySelectorAll('.story, .related-evidence, .empty')];
+      const searchableUnits = [...document.querySelectorAll('.story, .related-evidence, .empty, .candidate-exclusion')];
       const navLinks = [...document.querySelectorAll('.topic-nav a')];
       const scroller = document.getElementById('content-scroll');
       const topbar = document.querySelector('.topbar');
@@ -217,6 +313,18 @@
       search.addEventListener('input', filterBrief);
       search.addEventListener('keydown', event => {
         if (event.key === 'Escape') { search.value = ''; filterBrief(); search.focus(); }
+        if (event.key === 'Enter') {
+          filterBrief();
+          const firstMatch = stories.find(story => {
+            const parentSection = story.closest('.section');
+            return !story.hidden && (!parentSection || !parentSection.hidden);
+          });
+          if (!firstMatch) return;
+          event.preventDefault();
+          firstMatch.setAttribute('tabindex', '-1');
+          firstMatch.focus({preventScroll:true});
+          firstMatch.scrollIntoView({behavior:'smooth', block:'start'});
+        }
       });
       clear.addEventListener('click', () => { search.value = ''; filterBrief(); search.focus(); });
 

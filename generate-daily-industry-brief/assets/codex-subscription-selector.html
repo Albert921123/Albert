@@ -6,17 +6,21 @@
   #zhixun-v4 .topic-option:has(.form-check-input:checked){border-color:#174f3d;background:#174f3d;color:#fff;transform:translateY(-1px)}
   #zhixun-v4 .topic-option .form-check-input{accent-color:#174f3d}
   #zhixun-v4 .topic-option:has(.form-check-input:checked) .form-check-label{color:#fff}
+  #zhixun-v4 .profile-note{margin:.5rem 0 1rem;color:#52615a;font-size:.85rem;line-height:1.55}.zhixun-score{margin-left:auto;font-size:.78rem;font-weight:700;white-space:nowrap}.topic-option:has(.form-check-input:checked) .zhixun-score{color:#f1b799}
 </style>
 <div id="zhixun-v4">
   <div class="viz-row">
     <div>
       <h2>知讯日报订阅设置</h2>
-      <p class="text-muted">任意选择板块；24 小时优先，空板块补充至 48 小时；每板块最多 20 条；最终输出完整 HTML 文件。</p>
+      <p class="text-muted">先选岗位画像，再按 1–10 分调整各板块相关度。所有板块都可选择；无实时新闻时显示透明的基线追踪卡，不留空白、不编造新闻。</p>
     </div>
     <span class="viz-badge" id="zhixun-count">已选 2 / 16</span>
   </div>
 
   <div class="viz-controls">
+    <label class="form-label">使用场景
+      <select class="form-select" id="zhixun-profile"><option value="management">经营岗：企业经营与投融资优先</option><option value="production">生产岗：寻源与用工优先</option><option value="research">研究岗：政策与标准优先</option><option value="custom">自定义：自行调整相关度</option></select>
+    </label>
     <button class="btn" type="button" id="zhixun-all">全选</button>
     <button class="btn btn-ghost" type="button" id="zhixun-clear">清空</button>
     <label class="form-label">频率
@@ -32,6 +36,7 @@
       <input class="form-control" id="zhixun-limit" type="number" min="1" max="20" value="20" />
     </label>
   </div>
+  <p class="profile-note" id="zhixun-profile-note"></p>
 
   <div class="viz-grid" id="zhixun-topics" aria-label="资讯板块"></div>
 
@@ -79,12 +84,18 @@
     ["industry-data", "行业数据"], ["standards", "标准规范"],
     ["green", "绿色低碳"], ["extended", "拓展阅读"]
   ];
-  const storageKey = "zhixun-daily-brief-codex-v4.22";
+  const storageKey = "zhixun-daily-brief-codex-v4.26";
+  const profileDefaults = {
+    management:{fintech:8,sourcing:7,matching:8,employment:5,overseas:7,leadership:9,enterprise:10,capital:10,digital:7,informatization:6,"construction-tech":6,government:7,"industry-data":8,standards:5,green:6,extended:7},
+    production:{fintech:4,sourcing:10,matching:8,employment:10,overseas:4,leadership:4,enterprise:6,capital:3,digital:6,informatization:7,"construction-tech":8,government:6,"industry-data":7,standards:8,green:7,extended:5},
+    research:{fintech:5,sourcing:4,matching:4,employment:5,overseas:6,leadership:6,enterprise:7,capital:7,digital:7,informatization:6,"construction-tech":7,government:10,"industry-data":10,standards:10,green:8,extended:9},
+    custom:{fintech:5,sourcing:5,matching:5,employment:5,overseas:5,leadership:5,enterprise:5,capital:5,digital:5,informatization:5,"construction-tech":5,government:5,"industry-data":5,standards:5,green:5,extended:5}
+  };
   let saved = {};
   try {
     saved = window.__ZHIXUN_INITIAL_CONFIG__ && typeof window.__ZHIXUN_INITIAL_CONFIG__ === "object"
       ? window.__ZHIXUN_INITIAL_CONFIG__
-      : JSON.parse(localStorage.getItem(storageKey) || localStorage.getItem("zhixun-daily-brief-codex-v4.14") || localStorage.getItem("zhixun-daily-brief-codex-v4.13") || "{}");
+      : JSON.parse(localStorage.getItem(storageKey) || localStorage.getItem("zhixun-daily-brief-codex-v4.23") || localStorage.getItem("zhixun-daily-brief-codex-v4.22") || localStorage.getItem("zhixun-daily-brief-codex-v4.14") || localStorage.getItem("zhixun-daily-brief-codex-v4.13") || "{}");
   } catch { saved = {}; }
   const validTopicIds = new Set(topics.map((topic) => topic[0]));
   const restoredTopicIds = Array.isArray(saved.topic_ids) ? saved.topic_ids.filter((id) => validTopicIds.has(id)) : [];
@@ -93,6 +104,8 @@
     ? [...new Set(saved.custom_interests.map((value) => String(value).replace(/\s+/g, " ").trim()).filter(Boolean))].slice(0, 20)
     : [];
   const subscriptionId = /^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/.test(String(saved.subscription_id || "")) ? String(saved.subscription_id) : "primary";
+  let userProfile = Object.prototype.hasOwnProperty.call(profileDefaults, saved.user_profile) ? saved.user_profile : "custom";
+  let relevance = {...profileDefaults[userProfile], ...(saved.topic_relevance && typeof saved.topic_relevance === "object" ? saved.topic_relevance : {})};
   const isEditing = Object.keys(saved).length > 0;
   const grid = root.querySelector("#zhixun-topics");
   const count = root.querySelector("#zhixun-count");
@@ -100,6 +113,7 @@
   const status = root.querySelector("#zhixun-status");
 
   if (["daily", "weekdays"].includes(saved.cadence)) root.querySelector("#zhixun-cadence").value = saved.cadence;
+  root.querySelector("#zhixun-profile").value = userProfile;
   if (/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(String(saved.delivery_time || ""))) root.querySelector("#zhixun-time").value = saved.delivery_time;
   if (["host-default", "workbuddy-miniapp"].includes(saved.delivery_channel)) root.querySelector("#zhixun-delivery").value = saved.delivery_channel;
   if (Number.isInteger(Number(saved.max_items_per_topic))) root.querySelector("#zhixun-limit").value = String(Math.max(1, Math.min(20, Number(saved.max_items_per_topic))));
@@ -116,6 +130,8 @@
     const standardTotal = selectedIds().length;
     count.textContent = `${standardTotal} 个标准 · ${customInterests.length} 个自定义`;
     createButton.disabled = standardTotal + customInterests.length === 0;
+    root.querySelector("#zhixun-profile-note").textContent = userProfile === "management" ? "经营岗将优先企业公告、业绩会、交易所披露、资本与高管来源。" : userProfile === "production" ? "生产岗将优先招采平台、供应商征集、人社与项目现场来源。" : userProfile === "research" ? "研究岗将优先政府原文、标准机构、统计部门与行业协会来源。" : "自定义模式可在每一项右侧用 ± 按钮调整相关度。";
+    grid.querySelectorAll(".zhixun-score").forEach((score) => { score.textContent = `相关度 ${relevance[score.dataset.id] || 5}/10`; });
     const tags = root.querySelector("#zhixun-custom-tags");
     tags.replaceChildren();
     customInterests.forEach((interest) => {
@@ -150,7 +166,14 @@
     const text = document.createElement("span");
     text.className = "form-check-label";
     text.textContent = name;
-    label.append(input, text);
+    const score = document.createElement("button");
+    score.className = "btn btn-ghost zhixun-score";
+    score.type = "button";
+    score.dataset.id = id;
+    score.textContent = `相关度 ${relevance[id] || 5}/10`;
+    score.title = "点击循环调整相关度（1–10）";
+    score.addEventListener("click", (event) => { event.preventDefault(); event.stopPropagation(); relevance[id] = relevance[id] >= 10 ? 1 : relevance[id] + 1; userProfile = "custom"; root.querySelector("#zhixun-profile").value = "custom"; update(); });
+    label.append(input, text, score);
     grid.append(label);
     input.addEventListener("change", update);
   });
@@ -163,6 +186,7 @@
     grid.querySelectorAll('input[type="checkbox"]').forEach((input) => { input.checked = false; });
     update();
   });
+  root.querySelector("#zhixun-profile").addEventListener("change", (event) => { userProfile = event.currentTarget.value; relevance = {...profileDefaults[userProfile]}; grid.querySelectorAll('input[type="checkbox"]').forEach((input) => { input.checked = relevance[input.value] >= 8; }); update(); });
   root.querySelector("#zhixun-custom-add").addEventListener("click", () => addCustom(root.querySelector("#zhixun-custom-input").value));
   root.querySelector("#zhixun-custom-input").addEventListener("keydown", (event) => { if (event.key === "Enter") { event.preventDefault(); addCustom(event.currentTarget.value); } });
   root.querySelectorAll("[data-interest]").forEach((button) => button.addEventListener("click", () => addCustom(button.dataset.interest)));
@@ -174,12 +198,15 @@
     const limit = Math.max(1, Math.min(20, Number(limitInput.value) || 20));
     limitInput.value = String(limit);
     const config = {
-      version: "4.22",
+      version: "4.26",
       subscription_id: subscriptionId,
       update_existing: true,
       topics: names,
       topic_ids: ids,
       custom_interests: customInterests,
+      user_profile: userProfile,
+      topic_relevance: relevance,
+      coverage_policy: "continuity-with-transparent-baseline",
       industry_scope: "建筑与建筑科技生态",
       cadence: root.querySelector("#zhixun-cadence").value,
       delivery_time: root.querySelector("#zhixun-time").value || "08:30",
@@ -198,7 +225,7 @@
       host: "codex"
     };
     try { localStorage.setItem(storageKey, JSON.stringify(config)); } catch { /* storage unavailable */ }
-    const prompt = `使用 $generate-daily-industry-brief，根据下面配置更新或创建订阅。用户已确认，无需再次询问。必须将 custom_interests 中每个自定义方向作为每日HTML知讯的独立板块；每个自定义方向必须独立执行精确字段、来源主体、官方记录和业务交叉检索，零或一条正式资讯时再做全国媒体、专业垂直或可靠镜像扩展。关联资讯卡不能单独完成自定义板块，只要存在直接相关合格事件就必须至少形成一条正式主资讯。必须按 subscription_id 查找并原地更新现有自动化，禁止重复创建。所选时间固定解释为 Asia/Shanghai（UTC+08:00）。更新时间后重新生成绝对首跑时间，同时读取系统真实 nextRunAt 与后台最终持久化循环规则，并运行 verify_schedule.py 双重校验；仅 nextRunAt 匹配但循环规则不匹配时也必须判失败。修正原任务后重新读取两项，仍不匹配则停用并报告失败。保存当前配置指纹，按订阅ID、上海日期和配置指纹执行同日去重；若部署时当天新设时间已过，立即按当前配置检查并补发一次，旧配置日报不得阻止。宿主不支持恢复触发时必须明确报告并建议使用该宿主的云端/常驻调度器（如 WorkBuddy Cloud、系统任务计划、cron 守护等）。\n\n${JSON.stringify(config, null, 2)}`;
+    const prompt = `使用 $generate-daily-industry-brief，根据下面配置更新或创建订阅。用户已确认，无需再次询问。按 user_profile 与 topic_relevance 分配检索与来源优先级；每个已选板块都必须有可读卡片：先24小时正式资讯、再48小时补充、再有明确影响链的扩展相关资讯；仍无实时合格事件或宿主能力不足时输出透明“基线追踪”卡，不得留白或编造新闻。无Python时继续使用静态界面和HTML，记录手工校验；无搜索时按能力降级至官方列表/RSS/外部已验证输入。必须按 subscription_id 原地更新任务，禁止重复创建。\n\n${JSON.stringify(config, null, 2)}`;
     try {
       await window.openai.sendFollowUpMessage({ prompt, title: "更新知讯日报订阅" });
       status.textContent = "提交成功。Agent 通常会在 1 分钟内在对话中继续部署。如果对话迟迟没有动静，请发送「继续部署」四个字，Agent 会立即接着完成并反馈部署结果。";

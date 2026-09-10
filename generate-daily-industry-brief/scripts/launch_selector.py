@@ -105,7 +105,7 @@ def validate_submission(data, previous=None, force_update=False):
     if not SUBSCRIPTION_ID_PATTERN.fullmatch(subscription_id):
         raise ValueError("invalid subscription_id")
     data["max_items_per_topic"] = max_items
-    data["version"] = "4.22"
+    data["version"] = "4.26"
     data["lookback_hours"] = 24
     data["fallback_lookback_hours"] = 48
     data["fallback_policy"] = "extend_empty_sections"
@@ -149,9 +149,10 @@ def build_automation_request(config: dict) -> dict:
         "必须按 references/retrieval-audit.md 先为全部标准板块和自定义兴趣完成广度优先检索，并按 references/retrieval-routing.md 对失败页面逐级切换搜索、浏览器、官方替代端点、事件相关方和权威媒体证据链；"
         "有可核验合格信息的板块按发现阈值完成；零结果查询和最新条目超出窗口的官方索引属于已完成检索证据，不得因此标记受限；"
         "搜索能发现事件但原网页打不开时不得立即标记受限或丢弃，必须完成替代证据链；普通事实可由一个可访问的官方替代记录或一个明确指向原始事件的权威行业/财经来源核验，重大或争议信息需要官方记录或两个独立权威来源；"
-        "一条资讯同时真实关联多个已选板块时只保留一个主故事，并在其他相关板块显示带来源链接的关联资讯卡，不得因主板块去重让相关板块被误判为空；"
+        "同一事件若对两个已选板块分别具有A/B/C级价值，可在最多两个板块各生成一张共享event_id的完整资讯卡并分别撰写板块视角；第三个或更弱关联才使用紧凑关联卡；"
         "每个自定义兴趣必须独立执行精确字段、来源主体、官方记录和业务交叉四条路径，只有零或一条正式资讯时再做一次全国媒体、专业垂直或可靠镜像扩展；"
-        "自定义板块不能仅靠关联资讯卡判定完成，只要存在直接相关合格事件就必须至少形成一条正式主资讯；"
+        "任何标准或自定义板块都不能仅靠关联资讯卡判定完成，只要存在直接相关合格事件就必须至少形成一条正式资讯；"
+        "生成前必须写出逐候选检索台账 retrieval-ledger-YYYY-MM-DD.json，并先运行 validate_retrieval_ledger.py，再运行 validate_html.py；"
         "只有发现路径和适用的核验替代路径均实际失败时才标记检索受限；"
         "不得把检索受限写成暂无动态，且存在检索受限板块时不得写入成功标记；"
         "读取订阅配置中的 custom_interests，并把每个值作为独立的自定义关注板块检索和输出，相关板块重叠时优先保证自定义板块有正式主资讯；"

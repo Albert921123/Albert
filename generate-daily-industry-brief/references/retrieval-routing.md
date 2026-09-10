@@ -38,15 +38,11 @@ Mark a zero-item section `limited` only when at least one required discovery or 
 
 If discovery queries and required current indexes executed successfully and no event qualified, mark `checked-empty`, even if individual irrelevant candidates were blocked. If one or more events qualify, mark `complete`; a failed extra page does not downgrade the row.
 
-## Cross-section evidence without duplicate stories
+## Single-section event assignment
 
-One event can carry real business value for several selected sections. Assign one primary section and render the full story once. For every other genuinely relevant section, render a compact `关联资讯` card containing:
+An event may be relevant to several selected sections, but render it in exactly one. Select its home section by: exact field match; then direct decision impact; then user relevance score. Record every other possible section match in the candidate ledger as `excluded` with reason `assigned-to-<section-id>`; it remains a discovery lead but cannot be rendered as a full, cross-section or related card.
 
-- the event title and anchor to the primary story;
-- the distinct relevance bridge for this section;
-- the accessible evidence source and timestamp.
-
-Record these as `related_count`, not `included item count`. A standard section with a verified related card and completed discovery coverage may be `complete`, but the card must not be used to conceal a failed search or manufacture relevance. A custom-interest section can never be completed by a related card alone: if a directly relevant event exists, route at least one such event to the custom row as its formal main story; otherwise show a checked-empty or limited state after completing the required independent lanes.
+Do not use `跨板块复用` or `关联资讯`. Each visible story has one unique stable event ID and one section only. This keeps the daily brief from appearing fuller through repetition and forces each row to earn its own independent news.
 
 ## Host-neutral execution rule
 

@@ -4,6 +4,7 @@
 import argparse
 import json
 import re
+import subprocess
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -35,10 +36,30 @@ def is_valid_html_artifact(path: Path) -> bool:
     try:
         if path.stat().st_size < 128:
             return False
-        prefix = path.read_text(encoding="utf-8", errors="ignore")[:8192].lower()
+        text = path.read_text(encoding="utf-8", errors="ignore")
     except OSError:
         return False
-    return "<html" in prefix or "<!doctype html" in prefix
+    prefix = text[:8192].lower()
+    if not ("<html" in prefix or "<!doctype html" in prefix):
+        return False
+    # A transparent date-only observation is useful to readers, but it is not
+    # proof of a timestamped successful run.  Enforce the same rule here so a
+    # caller cannot accidentally suppress same-day retries.
+    return not bool(re.search(r'data-coverage-status=["\'](?:observed|expanded|business-observation|limited|baseline)["\']', text, re.I))
+
+
+def validators_pass(html_file: Path, ledger_file: Path) -> bool:
+    """Run both delivery gates; success markers cannot bypass the ledger."""
+    scripts_dir = Path(__file__).resolve().parent
+    commands = (
+        [sys.executable, str(scripts_dir / "validate_retrieval_ledger.py"), str(ledger_file)],
+        [sys.executable, str(scripts_dir / "validate_html.py"), str(html_file), "--ledger", str(ledger_file)],
+    )
+    for command in commands:
+        result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if result.returncode != 0:
+            return False
+    return True
 
 
 def load_config_state(path: Path) -> dict:
@@ -58,12 +79,17 @@ def main() -> int:
     parser.add_argument("--timezone", default="Asia/Shanghai")
     parser.add_argument("--state-dir", type=Path, default=Path(".zhixun-state"))
     parser.add_argument("--html-file", type=Path, required=True)
+    parser.add_argument("--ledger-file", type=Path, required=True)
     parser.add_argument("--config-state-file", type=Path)
     args = parser.parse_args()
     if not SUBSCRIPTION_ID_PATTERN.fullmatch(args.subscription_id):
         raise SystemExit("invalid subscription ID")
     if not is_valid_html_artifact(args.html_file):
         raise SystemExit(f"valid HTML artifact not found: {args.html_file}")
+    if not args.ledger_file.is_file():
+        raise SystemExit(f"validated retrieval ledger not found: {args.ledger_file}")
+    if not validators_pass(args.html_file, args.ledger_file):
+        raise SystemExit("delivery gate failed: retrieval ledger and HTML must both validate before success marking")
     now = datetime.now(resolve_timezone(args.timezone))
     args.state_dir.mkdir(parents=True, exist_ok=True)
     config_state_file = args.config_state_file or (

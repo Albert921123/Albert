@@ -10,7 +10,8 @@ Determine capabilities from the actual tool list and harmless read-only probes. 
 - archive extraction and file read/write;
 - shell and, if available, Python 3.6+ execution for the bundled helpers; Python is an enhancement rather than a requirement;
 - exposed search API/tool, if present — inspect the host's actual tool list and documented connectors for capability rather than an exact name. Examples may include `webSearch`, `search_web`, `internet_search`, `browser.search`, knowledge/news search, or a configured Bing/Google/SerpAPI-style connector. Select the strongest declared working API with one harmless query; never guess an unexposed endpoint, tool name, API key or credential;
-- controllable browser and whether it can navigate a public listing or a search-result page, including a user-authorized personal cloud computer/cloud desktop. A personal cloud desktop that the Agent can actually control is a Mode B transport, not an offline host: use it to search, open results, and inspect original pages without requiring a separately named `webSearch` tool;
+- B1 personal-cloud automation and whether it can navigate a public listing and a search-result page. When `yunzhu-browser-automation` is actually exposed on yz claw, it is a mandatory B1 probe candidate, not an optional feature the Agent may overlook; record `working`, `needs-auth`, `view-only`, `disconnected`, `denied`, `failed`, or `skipped-unavailable`;
+- B2 controllable ordinary browser and whether it can navigate a public listing or a search-result page. A personal cloud desktop that the Agent can actually control is an online transport, not an offline host: use it to search, open results, and inspect original pages without requiring a separately named `webSearch` tool;
 - direct URL access through any shell/native client (`curl`, `wget`, PowerShell `Invoke-WebRequest`, Node `fetch`, Python `urllib`, or host equivalent);
 - RSS, Atom, sitemap, official listing, public JSON/API, and site-native-search access;
 - external structured-feed input;
@@ -28,13 +29,13 @@ Before the first board query, the Agent itself must inspect its exposed tools, c
 1. a native keyword-search, news-search, knowledge-search or browser-search tool (regardless of its exact name);
 2. a configured MCP or enterprise search connector;
 3. `scripts/search_api_bridge.py` when a documented local or centrally managed credential exists;
-4. a controllable browser search-results page, which is Mode B rather than Mode A because the Agent is operating a webpage.
+4. B1 cloud-computer automation when exposed (including yz claw's `yunzhu-browser-automation`); then B2 a controllable browser search-results page. Both are Mode B rather than Mode A because the Agent is operating webpages.
 
 Record the exact capability name, route class, probe query, whether candidate URLs were returned, one original page opened for verification, and the failure reason if it did not work. Product branding (for example Codex, WorkBuddy, Claude Code or yz claw), a generic statement that the Internet is available, or the absence of `webSearch` is not capability evidence. A missing option is `skipped-unavailable`; immediately test the next route. Platform-native tools are normally visible only to the Agent, not to a local Python process, so a bundled script cannot discover or invoke a hidden host tool. Search output is discovery only and never replaces original-page verification.
 
 ## Retrieval modes
 
-Choose the highest available mode. Never silently jump to model memory or widen the time window. A live outbound connection must use Mode A or Mode B; Mode C is an enhancement or a last resort only when direct live retrieval genuinely cannot be performed. Optional unavailable modes are recorded as skipped, not treated as failures of the report. For every selected row, apply `coverage-continuity.md`: a qualifying 24/48-hour card is preferred; otherwise output a transparent extended-related or baseline-tracking card rather than a blank block.
+Choose the highest available mode. Never silently jump to model memory or widen the time window. A live outbound connection must use Mode A or Mode B; Mode C is an enhancement or a last resort only when direct live retrieval genuinely cannot be performed. Optional unavailable modes are recorded as skipped, not treated as failures of the report. For every selected row, apply `coverage-continuity.md`: a qualifying 24/48-hour card is preferred; a live/feed run may use a current extended/business observation or a checked-empty/limited reason card, while a baseline-tracking card is reserved exclusively for Mode D.
 
 ### Mode A — search API plus fetch
 
@@ -42,13 +43,17 @@ Use the strongest exposed and working host search API/service for breadth-first 
 
 For large subscriptions, batch independent section-specific queries up to the search tool's supported limit, then open candidates in a second phase. A successful zero-result query is retrieval evidence, not a capability failure. For quiet rows, inspect the compact official-index matrix in `source-map.md` and perform one independent authority/industry discovery pass before declaring the row checked-empty. Retry only rows whose query, index, timestamp, or page access actually failed.
 
-### Mode B — direct-network retrieval
+### Mode B1 — personal-cloud browser automation
+
+Use when an Agent-controllable cloud-computer automation capability is exposed. On yz claw, an exposed `yunzhu-browser-automation` must receive one read-only topic-relevant probe before B2 or non-browser fallbacks are selected. The probe must open a relevant official listing or homepage and then a public search or site-native-search page. Record the exact capability name, probe target, status, and whether an original page was opened in `run.network_probe.cloud_browser_probe`. Do not require a user reminder, screenshot, or copied search result. If B1 is `working`, use it for section discovery and original-page verification; if it is unavailable or a specific operation fails, record the precise status and move to B2.
+
+### Mode B2 — direct-network retrieval
 
 Use whenever any public outbound web route works but a full search tool is absent or insufficient: direct URL fetch, browser navigation, browser-based search-result pages, RSS/Atom, site maps, official listing pages, public JSON/API, or site-native search. This mode is not a weaker "no-news" path: it is a required live discovery path on networked hosts.
 
-#### Personal cloud computer / cloud-browser route
+#### B2 browser / cloud-browser route
 
-When the host supplies a user-authorized personal cloud computer, cloud browser, remote desktop, or browser-control session, treat it as a first-class Mode B transport. Product names are irrelevant. After confirming that the Agent can navigate it, the Agent must: (1) open a topic-relevant official list or homepage as the harmless probe; (2) use a public search page or a site-native search page for section-specific discovery; (3) open each proposed reader-facing source page, not merely a result snippet; and (4) record the visited direct URL, title, source family, displayed publication/event time, and the cloud-browser transport in the ledger. It must not tell the user to manually search/copy results when the browser session is controllable. If the session is view-only, login-blocked, disconnected, or not exposed to the Agent, record that precise condition and continue to the next available route; never claim that the cloud computer was used when it was not.
+When the host supplies a user-authorized ordinary browser, cloud browser, remote desktop, or browser-control session after B1 is unavailable, treat it as a first-class B2 transport. After confirming that the Agent can navigate it, the Agent must: (1) open a topic-relevant official list or homepage as the harmless probe; (2) use a public search page or a site-native search page for section-specific discovery; (3) open each proposed reader-facing source page, not merely a result snippet; and (4) record the visited direct URL, title, source family, displayed publication/event time, and the B2 browser transport in the ledger. It must not tell the user to manually search/copy results when the browser session is controllable. If the session is view-only, login-blocked, disconnected, or not exposed to the Agent, record that precise condition and continue to the next available route; never claim that the browser was used when it was not.
 
 1. Use the working transport in `network-retrieval-playbook.md` to open the curated per-section routes in `section-source-catalog.md` and `source-map.md` directly. The agent may use a browser, CLI HTTP, language-native HTTP, RSS reader, or public API; it must not require a prebuilt user feed.
 2. For every section, inspect one named primary/official listing or feed and one distinct discovery route (official site-native search, public search-result page, financial/vertical publisher, public API, sitemap, or counterparty route). If one route fails, switch transport or endpoint before treating the source as unavailable.
@@ -82,5 +87,5 @@ The searchable report depends on the template's inline JavaScript, not on web se
 
 - Generate a real `.html` file from `assets/daily-brief-template.html`; do not paste HTML into a chat renderer and call that the artifact.
 - Deliver the file as a downloadable attachment or filesystem link. A sanitized chat preview may remove `<script>` and is not proof that the artifact is broken.
-- When Python is present, write the matching `retrieval-ledger-YYYY-MM-DD.json`, run `scripts/validate_retrieval_ledger.py`, then run `scripts/validate_html.py` with the ledger-derived counts. A nonzero result from either validator means repair and revalidate; do not mark success. Without Python, apply the same checks manually and label the audit `manual-validation`.
+- When Python is present, write the matching work state, validated profiles, run plan, raw query receipts, `retrieval-ledger-YYYY-MM-DD.json` and structured brief model; use only `scripts/run_pipeline.py` for `init`, retrieval recording, authorization, deterministic rendering and finalization. A missing delivery receipt or any nonzero validator result means repair and revalidate; do not mark success. Without Python, apply the same checks manually and label the audit `manual-validation`, but do not claim a formal delivery receipt.
 - The validator must find the search input, filter function, highlighting logic, responsive sticky navigation, matching story structure, and safe new-window external links.

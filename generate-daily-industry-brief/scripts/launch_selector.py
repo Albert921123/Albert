@@ -118,7 +118,7 @@ def validate_submission(data, previous=None, force_update=False):
         data["previous_cadence"] = previous.get("cadence")
     data["create_schedule"] = True
     data["host"] = "universal"
-    data["missed_run_policy"] = "catch_up_same_day"
+    data["missed_run_policy"] = "catch_up_latest_due"
     data["catch_up_dedupe"] = True
     data["schedule_contract"] = build_contract(
         str(data.get("cadence", "weekdays")),

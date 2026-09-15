@@ -44,7 +44,7 @@ def is_valid_html_artifact(path: Path) -> bool:
         return False
     # A transparent date-only observation is useful to readers, but it is not
     # proof of a timestamped successful run.  Enforce the same rule here so a
-    # caller cannot accidentally suppress same-day retries.
+    # caller cannot accidentally suppress target-period retries.
     return not bool(re.search(r'data-coverage-status=["\'](?:observed|expanded|business-observation|limited|baseline)["\']', text, re.I))
 
 
@@ -81,6 +81,7 @@ def main() -> int:
     parser.add_argument("--html-file", type=Path, required=True)
     parser.add_argument("--ledger-file", type=Path, required=True)
     parser.add_argument("--config-state-file", type=Path)
+    parser.add_argument("--report-date", help="YYYY-MM-DD; required for a late catch-up target")
     args = parser.parse_args()
     if not SUBSCRIPTION_ID_PATTERN.fullmatch(args.subscription_id):
         raise SystemExit("invalid subscription ID")
@@ -91,6 +92,14 @@ def main() -> int:
     if not validators_pass(args.html_file, args.ledger_file):
         raise SystemExit("delivery gate failed: retrieval ledger and HTML must both validate before success marking")
     now = datetime.now(resolve_timezone(args.timezone))
+    report_date = args.report_date
+    if not report_date:
+        match = re.search(r"daily-industry-brief-(\d{4}-\d{2}-\d{2})\.html$", args.html_file.name)
+        report_date = match.group(1) if match else now.date().isoformat()
+    try:
+        datetime.strptime(report_date, "%Y-%m-%d")
+    except ValueError:
+        raise SystemExit("report-date must use YYYY-MM-DD")
     args.state_dir.mkdir(parents=True, exist_ok=True)
     config_state_file = args.config_state_file or (
         args.state_dir / f"current-config-{args.subscription_id}.json"
@@ -104,7 +113,7 @@ def main() -> int:
     temp = target.with_suffix(".tmp")
     temp.write_text(json.dumps({
         "subscription_id": args.subscription_id,
-        "local_date": now.date().isoformat(),
+        "local_date": report_date,
         "completed_at": now.isoformat(),
         "html_file": str(args.html_file.resolve()),
         "config_fingerprint": config_fingerprint,

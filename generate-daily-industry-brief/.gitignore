@@ -1,3 +1,4 @@
 # Local Python bytecode is not part of the portable skill package.
 scripts/__pycache__/
 *.pyc
+.zhixun-state/

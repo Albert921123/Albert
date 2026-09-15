@@ -11,7 +11,7 @@ from py36_compat import configure_utf8_stdio
 
 
 TEXT_SUFFIXES = {".md", ".json", ".html", ".py", ".cmd", ".sh", ".yaml", ".yml", ".txt"}
-SKIP_PARTS = {"__pycache__", ".git", ".DS_Store"}
+SKIP_PARTS = {"__pycache__", ".git", ".DS_Store", ".zhixun-state"}
 
 
 def inventory(root):

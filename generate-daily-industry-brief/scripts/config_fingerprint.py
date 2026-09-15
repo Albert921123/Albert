@@ -27,7 +27,7 @@ FINGERPRINT_FIELDS = (
 
 
 def canonical_config(config):
-    """Return only fields whose change requires a fresh same-day result."""
+    """Return only fields whose change requires a fresh target-period result."""
     return {field: config.get(field) for field in FINGERPRINT_FIELDS}
 
 

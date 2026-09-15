@@ -13,10 +13,11 @@ The only valid reasons to use Mode C or Mode D are: every available direct-netwo
 Do a small, read-only probe before retrieving. Do not rely on product branding or claim that a route works without using it. Try the available routes in this order, stopping after one route has actually returned a public page, feed, listing, or JSON response. Record unavailable tools as `skipped-unavailable` rather than calling them or presenting them as retrieval errors:
 
 1. **Search API/tool** — inspect the host's declared tool list and configured connectors for a search-result API. It may be named `webSearch`, `search_web`, `internet_search`, `browser.search`, knowledge/news search, or a configured Bing/Google/SerpAPI-style connector. Run one small topic-relevant query through the strongest exposed candidate and use it for broad discovery when it returns usable result URLs. Do not guess endpoint URLs, API keys, tool names or credentials that the host has not exposed.
-2. **Controllable browser / personal cloud computer** — when a user-authorized browser, cloud browser, cloud desktop, remote desktop, or computer-use session is exposed to the Agent, open one relevant official homepage or listing, then, if allowed, a public search-engine result page or an official site-native search page. This is a working Mode B route even if no tool is named `webSearch`; execute the queries and open original pages directly in the controllable session rather than asking the user to relay results.
-3. **HTTP client** — use the host's available non-mutating client: `curl`, `wget`, PowerShell `Invoke-WebRequest`, Node `fetch`, Python `urllib`, or an equivalent built-in request tool.
-4. **Feed/listing route** — directly read an RSS/Atom feed, XML sitemap, official announcements list, public-procurement index, exchange disclosure index, newsroom archive, or public JSON endpoint.
-5. **Authorized connector/feed** — read a current enterprise data connector or a validated JSON feed only when it is actually available.
+2. **B1: cloud-computer automation** — when a user-authorized personal cloud computer/browser automation capability is exposed, probe it before ordinary browser fallback. On yz claw, an exposed `yunzhu-browser-automation` capability is a named B1 candidate: invoke its documented browser-open/search action with one topic-relevant official target, then a public search or site-native-search page. Record `working`, `needs-auth`, `view-only`, `disconnected`, `denied`, `failed`, or `skipped-unavailable`; an absent `webSearch` tool is never a reason to skip this probe. Do not infer that the capability exists merely from the yz claw product name when its tool is not exposed.
+3. **B2: controllable ordinary browser / direct webpage** — when a user-authorized browser, cloud browser, remote desktop, or computer-use session is exposed but B1 is unavailable or failed, open one relevant official homepage or listing, then, if allowed, a public search-engine result page or an official site-native search page. Execute the queries and open original pages directly in the controllable session rather than asking the user to relay results.
+4. **HTTP client** — use the host's available non-mutating client: `curl`, `wget`, PowerShell `Invoke-WebRequest`, Node `fetch`, Python `urllib`, or an equivalent built-in request tool.
+5. **Feed/listing route** — directly read an RSS/Atom feed, XML sitemap, official announcements list, public-procurement index, exchange disclosure index, newsroom archive, or public JSON endpoint.
+6. **Authorized connector/feed** — read a current enterprise data connector or a validated JSON feed only when it is actually available.
 
 Use a relevant, publicly accessible target from `section-source-catalog.md` rather than a generic connectivity test. If Python 3.6+ exists, `scripts/probe_network.py --url <one-or-more-relevant-public-urls>` may record HTTP reachability; it is optional and does not replace browser or host-native routes.
 
@@ -25,7 +26,8 @@ Record the result in the ledger's `run.network_probe` object:
 ```json
 {
   "internet_reachable": true,
-  "working_routes": ["search-api: host-news-search", "browser", "official-listing"],
+  "working_routes": ["search-api: host-news-search", "B1: yunzhu-browser-automation", "official-listing"],
+  "cloud_browser_probe": {"capability": "yunzhu-browser-automation", "status": "working", "original_page_opened": true},
   "failed_routes": ["http-client: denied"],
   "mode_selection_reason": "The host's declared news-search API returned result URLs; browser verification and official listings are reachable."
 }
@@ -62,9 +64,9 @@ Use source-family **entry points**, not a fictional universal API:
 
 Do not require a construction keyword for broad selected fields (`数科`, `AI`, `政府宏观`, `行业数据`, `投融资`, `海外`, `绿色低碳`, `拓展阅读`, or broad custom interests). Construction relevance ranks otherwise equal evidence; it does not erase current, field-valid news.
 
-## Personal cloud computer evidence rule
+## B1 personal cloud computer automation evidence rule
 
-For a controllable personal cloud computer route, a search-engine result page is discovery evidence only. Before an item can enter the HTML, open its original source page in the cloud browser (or a direct official alternate), collect the reader-facing URL and timestamp, and put `browser-cloud` or the host's documented cloud-browser capability name in `transport_routes`. A cloud computer that is merely visible to the user but cannot be controlled by the Agent is not a working route.
+For a controllable personal cloud computer route, a search-engine result page is discovery evidence only. Before an item can enter the HTML, open its original source page in the cloud browser (or a direct official alternate), collect the reader-facing URL and timestamp, and put `B1:yunzhu-browser-automation` or the host's documented cloud-browser capability name in `transport_routes`. A cloud computer that is merely visible to the user but cannot be controlled by the Agent is not a working route. When B1 is `working`, it is the preferred Mode B discovery transport on that host; use B2 only if a particular page or browser operation fails and record the switch.
 
 ## Status discipline
 

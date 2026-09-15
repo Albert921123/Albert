@@ -4,6 +4,8 @@
 import argparse
 import json
 import re
+import subprocess
+import sys
 from collections import Counter
 from html.parser import HTMLParser
 from pathlib import Path
@@ -124,8 +126,19 @@ def main() -> int:
     parser.add_argument("--expected-cross-section", type=int)
     parser.add_argument("--expected-baseline", type=int)
     parser.add_argument("--ledger", type=Path)
+    parser.add_argument("--plan", type=Path)
     parser.add_argument("--allow-placeholders", action="store_true")
     args = parser.parse_args()
+
+    # ``--allow-placeholders`` exists only to test the distributed template.
+    # Accepting it for a dated report turns the validator into a shell check and
+    # can let an incomplete brief appear deliverable.
+    if args.allow_placeholders and args.html_file.name != "daily-brief-template.html":
+        print(json.dumps({
+            "ok": False,
+            "issues": ["--allow-placeholders is template-only; dated reports and previews must pass the full HTML/ledger validation"]
+        }, ensure_ascii=False, indent=2))
+        return 2
 
     # A live brief is not independently auditable without its candidate ledger.
     # Keep template validation usable, but make the normal artifact path fail
@@ -140,6 +153,27 @@ def main() -> int:
     issues = []
     if args.ledger is None and not args.allow_placeholders:
         issues.append("missing matching retrieval ledger; normal briefs require --ledger or a sibling retrieval-ledger-YYYY-MM-DD.json")
+    if args.ledger is not None and not args.allow_placeholders:
+        command = [
+            sys.executable,
+            str(Path(__file__).resolve().parent / "validate_retrieval_ledger.py"),
+            str(args.ledger),
+        ]
+        if args.expected_sections is not None:
+            command.extend(["--expected-sections", str(args.expected_sections)])
+        if args.plan is not None:
+            command.extend(["--plan", str(args.plan)])
+        ledger_gate = subprocess.run(
+            command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            universal_newlines=True,
+            encoding="utf-8",
+            errors="replace",
+        )
+        if ledger_gate.returncode:
+            detail = ledger_gate.stdout.strip().replace("\n", " ")
+            issues.append("linked retrieval ledger failed strict schema/depth validation: " + detail[:1200])
     try:
         text = args.html_file.read_text(encoding="utf-8")
     except Exception as exc:

@@ -7,6 +7,7 @@ standard library so the same Skill bundle works on older Agent hosts.
 
 import argparse
 import datetime
+import hashlib
 import json
 import sys
 import re
@@ -38,6 +39,10 @@ CANDIDATE_FIELDS = (
     "url",
     "source_name",
     "source_tier",
+    "source_family_id",
+    "source_class",
+    "actor_class",
+    "event_family",
     "time_basis",
     "query_lane",
     "relevance_level",
@@ -48,7 +53,15 @@ CANDIDATE_FIELDS = (
 
 STATUSES = {"complete", "observed", "expanded", "business-observation", "checked-empty", "limited", "baseline"}
 QUERY_LANES = {"field", "actor", "official", "business-intersection", "expansion"}
+REQUIRED_SECTION_LANES = {"field", "actor", "official", "business-intersection"}
 RELEVANCE_LEVELS = {"A", "B", "C", "D"}
+ACTOR_CLASSES = {
+    "regulator-or-public-body", "central-soe", "local-soe",
+    "listed-or-private-leader", "owner-customer-counterparty",
+    "exchange-procurement-association-research",
+}
+EVENT_FAMILIES = {"policy-data", "project-order", "enterprise-product", "capital-market", "risk-regulatory", "analysis-report"}
+SOURCE_CLASSES = {"official-or-regulatory", "company-or-disclosure", "transaction-or-project-platform", "national-or-financial-media", "vertical-or-local-media"}
 DECISIONS = {
     "included-primary",
     "included-cross-section",
@@ -61,8 +74,12 @@ DECISIONS = {
 }
 PLACEHOLDER_PATTERN = re.compile(r"某(?:软件厂商|企业|公司|媒体|机构|标准|高校)")
 GENERIC_STOP_PATTERN = re.compile(r"(?:暂无更多|没有更多|搜索结果有限|节省\s*token|节省令牌|时间不足|来不及)", re.I)
-LIVE_MODES = {"A", "B", "C"}
+LIVE_MODES = {"A", "B", "B1", "B2", "C"}
 DIRECT_NETWORK_ROUTES = {
+    "B1:yunzhu-browser-automation",
+    "cloud-browser-automation",
+    "B2:browser",
+    "B2:browser-search-page",
     "browser",
     "browser-search-page",
     "http-client",
@@ -133,6 +150,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("ledger_file", type=Path)
     parser.add_argument("--expected-sections", type=int)
+    parser.add_argument("--plan", type=Path, help="matching run-plan JSON created before retrieval")
     args = parser.parse_args()
 
     issues = []
@@ -157,6 +175,21 @@ def main():
     if not isinstance(candidates, list):
         issues.append("candidates must be an array")
         candidates = []
+
+    plan_rows = {}
+    if args.plan is not None:
+        try:
+            plan_payload = json.loads(args.plan.read_text(encoding="utf-8"))
+            raw_plan_rows = plan_payload.get("sections", []) if isinstance(plan_payload, dict) else []
+            if not isinstance(raw_plan_rows, list):
+                raise ValueError("sections must be an array")
+            for row in raw_plan_rows:
+                if isinstance(row, dict) and is_nonempty(row.get("section_id")):
+                    plan_rows[row["section_id"]] = row
+            if not plan_rows:
+                issues.append("run plan has no usable section rows")
+        except Exception as exc:
+            issues.append("cannot read matching run plan: %s" % exc)
 
     if args.expected_sections is not None and len(sections) != args.expected_sections:
         issues.append(
@@ -223,10 +256,18 @@ def main():
                 issues.append("network_probe failed_routes must be an array")
             if not is_nonempty(probe.get("mode_selection_reason")):
                 issues.append("network_probe needs mode_selection_reason")
-            if mode in {"A", "B"} and not network_reachable:
+            if mode in {"A", "B", "B1", "B2"} and not network_reachable:
                 issues.append("live direct retrieval mode requires internet_reachable=true")
-            if mode == "B" and not set(working_routes).intersection(DIRECT_NETWORK_ROUTES):
-                issues.append("Mode B needs a recorded direct-network route, not only a missing WebSearch claim")
+            if mode == "B1":
+                cloud_probe = probe.get("cloud_browser_probe")
+                if not isinstance(cloud_probe, dict) or cloud_probe.get("status") != "working":
+                    issues.append("Mode B1 needs a working cloud_browser_probe")
+                elif not is_nonempty(cloud_probe.get("capability")):
+                    issues.append("Mode B1 cloud_browser_probe needs capability name")
+                if not any(str(route).startswith("B1:") or str(route) == "cloud-browser-automation" for route in working_routes):
+                    issues.append("Mode B1 needs a recorded cloud-browser automation route")
+            if mode in {"B", "B2"} and not set(working_routes).intersection(DIRECT_NETWORK_ROUTES):
+                issues.append("Mode %s needs a recorded direct-network route, not only a missing WebSearch claim" % mode)
 
     section_ids = []
     section_rows = {}
@@ -284,15 +325,88 @@ def main():
                 issues.append("section[%s] missing retrieval_proof" % index)
             else:
                 lanes = proof.get("lanes_attempted")
+                query_evidence = proof.get("query_evidence")
                 families = proof.get("source_families_checked")
+                actor_classes = proof.get("actor_classes_checked")
+                event_families = proof.get("event_families_checked")
                 opened = proof.get("opened_candidate_count")
                 screened = proof.get("screened_candidate_count")
                 target = proof.get("target_card_count")
                 stop_reason = proof.get("stop_reason")
                 pool_closure = proof.get("candidate_pool_closure")
                 closure_reason = proof.get("closure_reason")
-                if not isinstance(lanes, list) or len([lane for lane in lanes if is_nonempty(lane)]) < 3:
-                    issues.append("section[%s] retrieval_proof needs at least three named lanes" % index)
+                pool_exhausted = proof.get("candidate_pool_exhausted")
+                additional_pass = proof.get("additional_discovery_completed")
+                below_target_reason = proof.get("below_target_reason")
+                lane_set = set(lane.strip() for lane in lanes if is_nonempty(lane)) if isinstance(lanes, list) else set()
+                if not REQUIRED_SECTION_LANES.issubset(lane_set):
+                    issues.append("section[%s] retrieval_proof must complete all four section-specific lanes" % index)
+                if not isinstance(query_evidence, list):
+                    issues.append("section[%s] retrieval_proof needs per-lane query_evidence" % index)
+                    query_evidence = []
+                evidenced_lanes = set()
+                discovered_result_total = 0
+                recorded_candidate_ids = []
+                evidenced_source_families = set()
+                evidenced_actor_classes = set()
+                evidenced_event_families = set()
+                for evidence_index, evidence in enumerate(query_evidence):
+                    if not isinstance(evidence, dict):
+                        issues.append("section[%s] query_evidence[%s] must be an object" % (index, evidence_index))
+                        continue
+                    lane = evidence.get("lane")
+                    if lane not in QUERY_LANES:
+                        issues.append("section[%s] query_evidence[%s] has invalid lane" % (index, evidence_index))
+                    else:
+                        evidenced_lanes.add(lane)
+                    if not is_nonempty(evidence.get("query")):
+                        issues.append("section[%s] query_evidence[%s] needs the section-specific query" % (index, evidence_index))
+                    if not is_nonempty(evidence.get("route")):
+                        issues.append("section[%s] query_evidence[%s] needs the executed route" % (index, evidence_index))
+                    if evidence.get("status") not in {"completed", "failed"}:
+                        issues.append("section[%s] query_evidence[%s] needs completed/failed status" % (index, evidence_index))
+                    if not is_count(evidence.get("result_count")):
+                        issues.append("section[%s] query_evidence[%s] needs a non-negative result_count" % (index, evidence_index))
+                    else:
+                        discovered_result_total += evidence.get("result_count")
+                    lane_candidate_ids = evidence.get("recorded_candidate_ids")
+                    if not isinstance(lane_candidate_ids, list):
+                        issues.append("section[%s] query_evidence[%s] needs recorded_candidate_ids" % (index, evidence_index))
+                    else:
+                        recorded_candidate_ids.extend(lane_candidate_ids)
+                        if is_count(evidence.get("result_count")) and evidence.get("result_count") != len(lane_candidate_ids):
+                            issues.append("section[%s] query_evidence[%s] result_count does not equal persisted candidates" % (index, evidence_index))
+                    for field, aggregate in (
+                        ("source_families_checked", evidenced_source_families),
+                        ("actor_classes_checked", evidenced_actor_classes),
+                        ("event_families_checked", evidenced_event_families),
+                    ):
+                        values = evidence.get(field)
+                        if not isinstance(values, list) or not any(is_nonempty(value) for value in values):
+                            issues.append("section[%s] query_evidence[%s] needs named %s" % (index, evidence_index, field))
+                        else:
+                            aggregate.update(value.strip() for value in values if is_nonempty(value))
+                    raw_path = Path(str(evidence.get("raw_results") or ""))
+                    if not raw_path.is_absolute(): raw_path = args.ledger.parent / raw_path
+                    raw_hash = str(evidence.get("raw_results_sha256") or "").strip().lower()
+                    transport = evidence.get("transport_evidence") if isinstance(evidence.get("transport_evidence"), dict) else {}
+                    if not raw_path.is_file() or not re.match(r"^[0-9a-f]{64}$", raw_hash):
+                        issues.append("section[%s] query_evidence[%s] needs a readable hash-bound raw-results file" % (index, evidence_index))
+                    elif hashlib.sha256(raw_path.read_bytes()).hexdigest() != raw_hash:
+                        issues.append("section[%s] query_evidence[%s] raw-results hash mismatch" % (index, evidence_index))
+                    captured_at = str(transport.get("captured_at") or "").strip()
+                    invocation_id = str(transport.get("invocation_id") or "").strip()
+                    no_id_reason = str(transport.get("invocation_id_not_exposed_reason") or "").strip()
+                    if not is_nonempty(transport.get("tool_name")) or not captured_at:
+                        issues.append("section[%s] query_evidence[%s] needs transport tool_name and captured_at" % (index, evidence_index))
+                    elif not re.match(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$", captured_at):
+                        issues.append("section[%s] query_evidence[%s] captured_at must include an ISO timezone" % (index, evidence_index))
+                    if not invocation_id and len(no_id_reason) < 10:
+                        issues.append("section[%s] query_evidence[%s] needs invocation_id or a specific not-exposed reason" % (index, evidence_index))
+                if not REQUIRED_SECTION_LANES.issubset(evidenced_lanes):
+                    issues.append("section[%s] query_evidence does not prove all four independent board lanes" % index)
+                if is_count(row.get("query_count")) and row.get("query_count") != len(query_evidence):
+                    issues.append("section[%s] query_count does not equal per-lane query_evidence records" % index)
                 if not isinstance(families, list) or len(set([family.strip() for family in families if is_nonempty(family)])) < 2:
                     issues.append("section[%s] retrieval_proof needs two named source families" % index)
                 else:
@@ -301,23 +415,67 @@ def main():
                         issues.append("section[%s] retrieval_proof uses a transport label as a source family" % index)
                     if is_count(row.get("source_family_count")) and row.get("source_family_count") != len(unique_families):
                         issues.append("section[%s] source_family_count does not equal distinct named source families" % index)
+                    if unique_families != evidenced_source_families:
+                        issues.append("section[%s] source_families_checked does not reconcile to per-query evidence" % index)
+                if not isinstance(actor_classes, list) or len(set(value.strip() for value in actor_classes if is_nonempty(value))) < 3:
+                    issues.append("section[%s] retrieval_proof needs at least three actor classes" % index)
+                elif set(value.strip() for value in actor_classes if is_nonempty(value)) != evidenced_actor_classes:
+                    issues.append("section[%s] actor_classes_checked does not reconcile to per-query evidence" % index)
+                if not isinstance(event_families, list) or len(set(value.strip() for value in event_families if is_nonempty(value))) < 3:
+                    issues.append("section[%s] retrieval_proof needs at least three event families" % index)
+                elif set(value.strip() for value in event_families if is_nonempty(value)) != evidenced_event_families:
+                    issues.append("section[%s] event_families_checked does not reconcile to per-query evidence" % index)
                 if not is_count(opened):
                     issues.append("section[%s] retrieval_proof has invalid opened_candidate_count" % index)
                 if not is_count(screened) or (is_count(opened) and screened < opened):
                     issues.append("section[%s] retrieval_proof needs screened_candidate_count at least opened_candidate_count" % index)
                 if not is_count(target) or target < 2 or target > 3:
                     issues.append("section[%s] retrieval_proof target_card_count must be 2 or 3" % index)
-                # A target is a presentation-quality comparison target; the
-                # actual candidate ledger must demonstrate that discovery did
-                # not stop after the first seemingly valid result.
-                min_candidates = 6 if target == 3 else 4
-                min_families = 3 if target == 3 else 2
-                if is_count(opened) and opened < min_candidates:
+                # target_card_count is a discovery target, never a rendered-card
+                # quota. A genuinely scarce row may close below the ordinary
+                # 4/6 review floor, but only with machine-readable proof that all
+                # required lanes and an additional discovery pass were exhausted.
+                is_closed_without_card = status in {"checked-empty", "limited"}
+                min_candidates = 3 if is_closed_without_card else (6 if target == 3 else 4)
+                min_families = 2 if is_closed_without_card else (3 if target == 3 else 2)
+                rendered_full_count = (
+                    (row.get("primary_card_count") or 0)
+                    + (row.get("date_observation_card_count") or 0)
+                    + (row.get("expanded_card_count") or 0)
+                    + (row.get("business_observation_card_count") or 0)
+                )
+                scarce_pool_proved = (
+                    pool_exhausted is True
+                    and additional_pass is True
+                    and is_nonempty(below_target_reason)
+                    and not GENERIC_STOP_PATTERN.search(below_target_reason or "")
+                    and REQUIRED_SECTION_LANES.issubset(evidenced_lanes)
+                    and is_count(opened)
+                    and is_count(screened)
+                    and opened == row.get("candidate_count")
+                    and screened >= opened
+                    and discovered_result_total == len(recorded_candidate_ids)
+                )
+                if is_count(opened) and opened < min_candidates and not scarce_pool_proved:
                     issues.append(
-                        "section[%s] retrieval_proof needs at least %s opened candidates for target %s"
+                        "section[%s] below review depth needs exhausted-pool proof and an additional discovery pass (normal floor %s for target %s)"
                         % (index, min_candidates, target)
                     )
-                if isinstance(families, list) and len(set([family.strip() for family in families if is_nonempty(family)])) < min_families:
+                if rendered_full_count < target and not scarce_pool_proved:
+                    issues.append("section[%s] below target needs candidate_pool_exhausted, additional_discovery_completed and a specific below_target_reason" % index)
+                if rendered_full_count < target:
+                    expansion_rows = [e for e in query_evidence if isinstance(e, dict) and e.get("lane") == "expansion"]
+                    if len(expansion_rows) != 1:
+                        issues.append("section[%s] below target needs exactly one evidenced expansion pass" % index)
+                    else:
+                        expansion_families = set(value.strip() for value in expansion_rows[0].get("source_families_checked", []) if is_nonempty(value))
+                        earlier_families = set()
+                        for evidence in query_evidence:
+                            if isinstance(evidence, dict) and evidence.get("lane") != "expansion":
+                                earlier_families.update(value.strip() for value in evidence.get("source_families_checked", []) if is_nonempty(value))
+                        if len(expansion_families) < 2 or not (expansion_families - earlier_families):
+                            issues.append("section[%s] expansion must check two families and add a changed source family" % index)
+                if isinstance(families, list) and len(set([family.strip() for family in families if is_nonempty(family)])) < min_families and not scarce_pool_proved:
                     issues.append(
                         "section[%s] retrieval_proof needs at least %s independent source families for target %s"
                         % (index, min_families, target)
@@ -339,6 +497,16 @@ def main():
     duplicates = [value for value, count in Counter(section_ids).items() if count > 1]
     if duplicates:
         issues.append("duplicate section ids: %s" % ", ".join(sorted(duplicates)))
+    if plan_rows:
+        ledger_ids = set(section_ids)
+        planned_ids = set(plan_rows)
+        if ledger_ids != planned_ids:
+            missing = sorted(planned_ids - ledger_ids)
+            extra = sorted(ledger_ids - planned_ids)
+            if missing:
+                issues.append("ledger omits planned sections: %s" % ", ".join(missing))
+            if extra:
+                issues.append("ledger contains sections absent from plan: %s" % ", ".join(extra))
 
     candidate_counts = Counter()
     decision_counts = Counter()
@@ -359,7 +527,7 @@ def main():
             issues.append("candidate[%s] references unknown section_id" % index)
         else:
             candidate_counts[section_id] += 1
-        for field in ("section_label", "title", "source_name", "source_tier", "time_basis", "reason", "evidence_route"):
+        for field in ("section_label", "title", "source_name", "source_tier", "source_family_id", "source_class", "actor_class", "event_family", "time_basis", "reason", "evidence_route"):
             if not is_nonempty(row.get(field)):
                 issues.append("candidate[%s] has invalid %s" % (index, field))
         if PLACEHOLDER_PATTERN.search((row.get("title") or "") + (row.get("source_name") or "")):
@@ -371,6 +539,12 @@ def main():
             issues.append("candidate[%s] has invalid query_lane" % index)
         if row.get("relevance_level") not in RELEVANCE_LEVELS:
             issues.append("candidate[%s] has invalid relevance_level" % index)
+        if row.get("actor_class") not in ACTOR_CLASSES:
+            issues.append("candidate[%s] has invalid actor_class" % index)
+        if row.get("event_family") not in EVENT_FAMILIES:
+            issues.append("candidate[%s] has invalid event_family" % index)
+        if row.get("source_class") not in SOURCE_CLASSES:
+            issues.append("candidate[%s] has invalid source_class" % index)
         decision = row.get("decision")
         if decision not in DECISIONS:
             issues.append("candidate[%s] has invalid decision" % index)
@@ -481,14 +655,15 @@ def main():
             if is_count(opened) and opened != candidate_counts[section_id]:
                 issues.append("opened candidate count mismatch for %s: declared %s, found %s" % (section_id, opened, candidate_counts[section_id]))
             target = proof.get("target_card_count")
-            min_candidates = 6 if target == 3 else 4
-            if is_count(target) and candidate_counts[section_id] < min_candidates:
+            is_closed_without_card = row.get("status") in {"checked-empty", "limited"}
+            min_candidates = 3 if is_closed_without_card else (6 if target == 3 else 4)
+            if is_count(target) and candidate_counts[section_id] < min_candidates and not scarce_pool_proved:
                 issues.append(
                     "section %s has insufficient real candidate records: needs %s for target %s, found %s"
                     % (section_id, min_candidates, target, candidate_counts[section_id])
                 )
             full_count = sum(actual[decision] for decision in ("included-primary", "included-cross-section", "included-date-observation", "included-expanded", "included-business-observation"))
-            if is_count(target) and full_count < target:
+            if is_count(target) and full_count < target and not is_closed_without_card and not scarce_pool_proved:
                 if proof.get("additional_discovery_completed") is not True:
                     issues.append("under-target row %s lacks completed additional discovery pass" % section_id)
                 if candidate_counts[section_id] < target + 2:
@@ -506,6 +681,14 @@ def main():
                             domains.add(parsed.netloc.lower())
                 if len(domains) < 2:
                     issues.append("under-target row %s lacks evidence from two candidate domains" % section_id)
+        if section_id in plan_rows:
+            planned = plan_rows[section_id]
+            floor = planned.get("candidate_review_floor")
+            family_floor = planned.get("source_family_floor")
+            if is_count(floor) and candidate_counts[section_id] < floor and not scarce_pool_proved:
+                issues.append("section %s is below planned candidate review floor: needs %s, found %s" % (section_id, floor, candidate_counts[section_id]))
+            if is_count(family_floor) and is_count(row.get("source_family_count")) and row.get("source_family_count") < family_floor and not scarce_pool_proved:
+                issues.append("section %s is below planned source-family floor: needs %s, found %s" % (section_id, family_floor, row.get("source_family_count")))
 
     for event_id, decisions in event_decisions.items():
         full_count = sum(1 for decision in decisions if decision in {"included-primary", "included-cross-section", "included-date-observation", "included-expanded", "included-business-observation"})

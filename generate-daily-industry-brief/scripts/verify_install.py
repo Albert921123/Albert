@@ -23,22 +23,37 @@ REQUIRED = (
     "references/retrieval-routing.md",
     "references/runtime-compatibility.md",
     "references/network-retrieval-playbook.md",
+    "references/unknown-section-retrieval.md",
     "references/role-profiles.md",
     "references/coverage-continuity.md",
     "references/editorial-standard.md",
     "references/macro-editorial-architecture.md",
+    "references/execution-runner.md",
     "references/news-input-schema.json",
     "scripts/validate_preferences.py",
     "scripts/py36_compat.py",
     "scripts/validate_html.py",
     "scripts/validate_news_input.py",
     "scripts/validate_retrieval_ledger.py",
+    "scripts/validate_section_profiles.py",
     "scripts/probe_network.py",
     "scripts/search_api_bridge.py",
     "scripts/setup_tavily.py",
     "scripts/verify_schedule.py",
     "scripts/create_reading_receipt.py",
     "scripts/verify_reading_receipt.py",
+    "scripts/run_state.py",
+    "scripts/prepare_run_plan.py",
+    "scripts/validate_time_window.py",
+    "scripts/verify_editorial_gate.py",
+    "scripts/verify_delivery_gate.py",
+    "scripts/run_brief.py",
+    "scripts/run_pipeline.py",
+    "scripts/render_brief.py",
+    "scripts/validate_source_registry.py",
+    "scripts/validate_brief_model.py",
+    "scripts/validate_package_consistency.py",
+    "references/source-registry.json",
 )
 
 
@@ -46,7 +61,7 @@ def main():
     configure_utf8_stdio()
     parser = argparse.ArgumentParser()
     parser.add_argument("--skill-dir", type=Path, default=Path(__file__).resolve().parent.parent)
-    parser.add_argument("--expected-version", default="1.35.3")
+    parser.add_argument("--expected-version", default="1.42.0")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
 

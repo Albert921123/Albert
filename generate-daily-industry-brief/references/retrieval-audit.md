@@ -19,10 +19,10 @@ Each row contains:
 - a short reason whenever status is not `complete`. A `baseline` row means the continuity ladder was exhausted and a clearly non-news tracking card was rendered instead of visual blank space.
 - verification route used for each included event: original, browser-rendered original, official alternate, event counterparty, or authority/industry fallback.
 - one candidate-ledger record for every opened plausible candidate, including title, URL, time basis, query lane, relevance level (`A`, `B`, `C`, or `D`), decision, exact exclusion reason, and evidence route.
-- `retrieval_proof` as defined in `anti-shortcut-execution.md`, including `screened_candidate_count`, `candidate_pool_closure` (`required-lanes-exhausted` or `max-items-reached`) and a specific `closure_reason`. It is mandatory for new live, direct-fetch, and feed-backed runs.
+- `retrieval_proof` as defined in `anti-shortcut-execution.md`, including `screened_candidate_count`, `candidate_pool_closure` (`required-lanes-exhausted` or `max-items-reached`), `source_families_checked`, `actor_classes_checked`, `event_families_checked`, per-query evidence, and a specific `closure_reason`. It is mandatory for new live, direct-fetch, and feed-backed runs. The aggregate class arrays must exactly reconcile to the union of the per-query evidence.
 - `run_discovery`: `live`, `feed`, or `offline`; an HTML/ledger from an earlier run is never a valid discovery source. If it is consulted as a lead, record the fresh page that re-verified the retained event.
 
-For Mode A/B runs, the top-level `run` object also contains `network_probe` from `network-retrieval-playbook.md`: `internet_reachable`, `working_routes`, `failed_routes`, and a concrete `mode_selection_reason`. Every section's `retrieval_proof` then contains `transport_routes` and `direct_source_passes`. `direct_source_passes` must identify an **official-index** pass and an **independent-discovery** pass. A missing tool named `webSearch` is not a failed source pass when another public network route works.
+For Mode A/B1/B2 runs, the top-level `run` object also contains `network_probe` from `network-retrieval-playbook.md`: `internet_reachable`, `working_routes`, `failed_routes`, and a concrete `mode_selection_reason`. A B1 run additionally contains `cloud_browser_probe` with the exact capability name and its result. Every section's `retrieval_proof` then contains `transport_routes` and `direct_source_passes`. `direct_source_passes` must identify an **official-index** pass and an **independent-discovery** pass. A missing tool named `webSearch` is not a failed source pass when another public network route works.
 
 A source family is an independently maintained primary-source channel, such as a ministry or local-government publication stream, a public-procurement platform, an exchange filing system, a company newsroom or investor-relations site, a standards publisher, or an original research publisher. Multiple search queries against the same website count as one source family.
 
@@ -41,7 +41,7 @@ Use the topic cues in `topics.md`, the source pool in `source-map.md`, and the e
 - Treat `数科`, `AI`, `政府宏观`, `行业数据`, `海外`, `企业经营`, `投融资`, `绿色低碳` and broad custom interests as high-output fields. If they finish with fewer than two full section cards, run the additional discovery pass even when compact related evidence exists.
 - For every high-output or 7–10 relevance row, record at least one Layer 2/3/4 discovery family from `discovery-source-ladder.md` in addition to a primary/statutory family, and at least three independent source families in total. The record may be an excluded candidate or a final citation, but it must be genuinely inspected; an agent may not report a broad search after checking only ministry, government or company homepages.
 - On a live-search host, do not finalize an active selected row after a single result merely because it is an official page. First execute one national/statutory or major-financial discovery lane and one independent official, vertical, exchange/disclosure or procurement lane. The only exception is a demonstrably quiet 24-hour field after its required empty-section checks; record that evidence explicitly.
-- On any networked Mode B host, the same rule applies through direct navigation: one official index/feed/listing plus one independent site-native-search, public-search-page, financial/vertical, counterparty, mirror, sitemap or public-API route. It is not permissible to skip this because an RSS aggregator or named web-search tool is absent.
+- On any networked Mode B1 or B2 host, the same rule applies through direct navigation: one official index/feed/listing plus one independent site-native-search, public-search-page, financial/vertical, counterparty, mirror, sitemap or public-API route. It is not permissible to skip this because an RSS aggregator or named web-search tool is absent.
 
 ## Candidate ledger artifact
 
@@ -51,7 +51,7 @@ Each `sections` row must include `section_id`, `label`, `source_family_count`, `
 
 Each `candidates` row must include:
 
-- `section_id`, `section_label`, `title`, `url`, `direct_record_url`, `direct_record_kind`, `canonical_url`, `source_family_id`, `event_fingerprint`, `source_name`, and `source_tier`;
+- `section_id`, `section_label`, `title`, `url`, `direct_record_url`, `direct_record_kind`, `canonical_url`, `source_family_id`, `source_class`, `actor_class`, `event_family`, `event_fingerprint`, `source_name`, and `source_tier`;
 - `published_at` or `event_at`, plus `time_basis`, `time_basis_type`, `timestamp_precision`, and `window_class`; an `included-baseline` row may instead use `retrieved_at` and `baseline_kind`;
 - `query_lane`: `field`, `actor`, `official`, `business-intersection`, or `expansion`;
 - `relevance_level`: `A`, `B`, `C`, or `D`;
@@ -59,7 +59,7 @@ Each `candidates` row must include:
 - `reason`: required for every exclusion and recommended for every inclusion;
 - `evidence_route` and a stable `event_id` when the event is included in any form.
 
-Run `python scripts/validate_retrieval_ledger.py <ledger> --expected-sections <selected-count>` before HTML validation when Python is available; otherwise perform the equivalent manual checks. A missing row, unexplained exclusion, malformed URL, unsupported decision, missing network probe/direct-source proof, missing anti-shortcut proof, or included event without an `event_id` blocks the success marker. In the reader-facing HTML, show the top three excluded candidates for every checked-empty row with title, date and concise reason. Do not expose raw query strings.
+Run `python scripts/validate_retrieval_ledger.py <ledger> --expected-sections <selected-count> --plan <run-plan>` and `python scripts/validate_source_registry.py <ledger> --registry references/source-registry.json` before authorization when Python is available. Each query-evidence row must name the source families, actor classes and event families actually inspected and must carry `raw_results`, `raw_results_sha256` and `transport_evidence`. The referenced receipt must be readable and hash-identical; its result count must equal the persisted candidate IDs. An under-target section must have exactly one expansion evidence row covering at least two source families and adding at least one changed family. A missing row, unexplained exclusion, malformed URL, unsupported source claim, missing raw receipt, missing network probe/direct-source proof, missing universal search-matrix proof, or included event without an `event_id` blocks the success marker. `validate_html.py` repeats the strict ledger validation for every normal dated report; it cannot be bypassed with an included-cards-only ledger. In the reader-facing HTML, show the top excluded candidates for every checked-empty row with title, date and concise reason. Do not expose raw query strings.
 
 ### What counts as completed coverage
 

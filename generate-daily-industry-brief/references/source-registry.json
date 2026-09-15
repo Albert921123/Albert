@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "registry_version": "2026-09-15",
+  "policy": {
+    "official_claim_requires_registered_domain": true,
+    "tier1_claim_requires_registered_domain_or_exception": true,
+    "unregistered_exception_min_reason_chars": 20
+  },
+  "allowed_source_classes": [
+    "official-or-regulatory",
+    "company-or-disclosure",
+    "transaction-or-project-platform",
+    "national-or-financial-media",
+    "vertical-or-local-media"
+  ],
+  "sources": [
+    {"id":"china-government","domains":["gov.cn"],"match":"suffix","tier":"T1","classes":["official-or-regulatory"],"label":"中国政府及各级政府部门"},
+    {"id":"mohurd","domains":["mohurd.gov.cn"],"match":"suffix","tier":"T1","classes":["official-or-regulatory"],"label":"住房和城乡建设部"},
+    {"id":"ndrc","domains":["ndrc.gov.cn"],"match":"suffix","tier":"T1","classes":["official-or-regulatory"],"label":"国家发展改革委"},
+    {"id":"mof","domains":["mof.gov.cn"],"match":"suffix","tier":"T1","classes":["official-or-regulatory"],"label":"财政部"},
+    {"id":"sasac","domains":["sasac.gov.cn"],"match":"suffix","tier":"T1","classes":["official-or-regulatory"],"label":"国务院国资委"},
+    {"id":"stats","domains":["stats.gov.cn"],"match":"suffix","tier":"T1","classes":["official-or-regulatory"],"label":"国家统计局"},
+    {"id":"samr","domains":["samr.gov.cn"],"match":"suffix","tier":"T1","classes":["official-or-regulatory"],"label":"市场监管总局"},
+    {"id":"csrc","domains":["csrc.gov.cn"],"match":"suffix","tier":"T1","classes":["official-or-regulatory","company-or-disclosure"],"label":"中国证监会"},
+    {"id":"sse","domains":["sse.com.cn"],"match":"suffix","tier":"T1","classes":["company-or-disclosure","transaction-or-project-platform"],"label":"上海证券交易所"},
+    {"id":"szse","domains":["szse.cn"],"match":"suffix","tier":"T1","classes":["company-or-disclosure","transaction-or-project-platform"],"label":"深圳证券交易所"},
+    {"id":"bse","domains":["bse.cn"],"match":"suffix","tier":"T1","classes":["company-or-disclosure","transaction-or-project-platform"],"label":"北京证券交易所"},
+    {"id":"ccgp","domains":["ccgp.gov.cn"],"match":"suffix","tier":"T1","classes":["transaction-or-project-platform"],"label":"中国政府采购网"},
+    {"id":"ggzy","domains":["ggzy.gov.cn"],"match":"suffix","tier":"T1","classes":["transaction-or-project-platform"],"label":"全国公共资源交易平台体系"},
+    {"id":"xinhua","domains":["news.cn","xinhuanet.com"],"match":"suffix","tier":"T2","classes":["national-or-financial-media"],"label":"新华社/新华网"},
+    {"id":"people","domains":["people.com.cn"],"match":"suffix","tier":"T2","classes":["national-or-financial-media"],"label":"人民网"},
+    {"id":"chinanews","domains":["chinanews.com.cn"],"match":"suffix","tier":"T2","classes":["national-or-financial-media"],"label":"中国新闻网"},
+    {"id":"stcn","domains":["stcn.com"],"match":"suffix","tier":"T2","classes":["national-or-financial-media"],"label":"证券时报"},
+    {"id":"cnstock","domains":["cnstock.com"],"match":"suffix","tier":"T2","classes":["national-or-financial-media"],"label":"上海证券报"},
+    {"id":"cs","domains":["cs.com.cn"],"match":"suffix","tier":"T2","classes":["national-or-financial-media"],"label":"中国证券报"},
+    {"id":"yicai","domains":["yicai.com"],"match":"suffix","tier":"T2","classes":["national-or-financial-media"],"label":"第一财经"},
+    {"id":"21jingji","domains":["21jingji.com"],"match":"suffix","tier":"T2","classes":["national-or-financial-media"],"label":"21世纪经济报道"},
+    {"id":"caixin","domains":["caixin.com"],"match":"suffix","tier":"T2","classes":["national-or-financial-media"],"label":"财新"},
+    {"id":"cls","domains":["cls.cn"],"match":"suffix","tier":"T2","classes":["national-or-financial-media"],"label":"财联社"},
+    {"id":"thepaper","domains":["thepaper.cn"],"match":"suffix","tier":"T2","classes":["national-or-financial-media","vertical-or-local-media"],"label":"澎湃新闻"}
+  ]
+}

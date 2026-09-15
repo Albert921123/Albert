@@ -143,7 +143,13 @@ def parse_int_set(properties, key):
         raise ValueError(f"{key} must contain integers") from exc
 
 
-def verify_recurrence(contract, reported_rrule, require_timezone_aware_rrule):
+def verify_recurrence(
+    contract,
+    reported_rrule,
+    require_timezone_aware_rrule,
+    reported_timezone=None,
+    require_timezone_evidence=False,
+):
     properties, dtstart_tzid = parse_rrule(reported_rrule)
     hour, minute = map(int, str(contract["wall_clock_time"]).split(":"))
     cadence = str(contract["cadence"])
@@ -172,14 +178,26 @@ def verify_recurrence(contract, reported_rrule, require_timezone_aware_rrule):
             issues.append("daily cadence must omit BYDAY or include all seven days")
 
     expected_timezone = str(contract["timezone"])
-    timezone_matches = dtstart_tzid == expected_timezone
+    reported_timezone = (reported_timezone or "").strip() or None
+    timezone_evidence = dtstart_tzid or reported_timezone
+    timezone_matches = timezone_evidence == expected_timezone
+    if dtstart_tzid and dtstart_tzid != expected_timezone:
+        issues.append(f"DTSTART timezone must be {expected_timezone}")
+    if reported_timezone and reported_timezone != expected_timezone:
+        issues.append(f"reported scheduler timezone must be {expected_timezone}")
     if require_timezone_aware_rrule and not timezone_matches:
         issues.append(f"DTSTART must declare TZID={expected_timezone}")
+    elif require_timezone_evidence and not timezone_matches:
+        issues.append(
+            f"schedule needs TZID={expected_timezone} or --reported-timezone {expected_timezone}"
+        )
 
     return {
         "reported_rrule_raw": reported_rrule,
         "reported_rrule_properties": properties,
         "reported_rrule_timezone": dtstart_tzid,
+        "reported_scheduler_timezone": reported_timezone,
+        "schedule_timezone_evidence": timezone_evidence,
         "recurrence_timezone_matches_expected": timezone_matches,
         "recurrence_issues": issues,
         "recurrence_matches_expected": not issues,
@@ -196,9 +214,18 @@ def main() -> int:
     parser.add_argument("--reported-next-run", help="Host nextRunAt as ISO-8601 or Unix seconds/milliseconds")
     parser.add_argument("--reported-rrule", help="Host-persisted RRULE, with or without DTSTART")
     parser.add_argument(
+        "--reported-timezone",
+        help="Scheduler timezone returned separately when a persisted RRULE has no TZID",
+    )
+    parser.add_argument(
         "--require-timezone-aware-rrule",
         action="store_true",
         help="Require DTSTART to carry the requested TZID",
+    )
+    parser.add_argument(
+        "--require-timezone-evidence",
+        action="store_true",
+        help="Require either DTSTART;TZID or a matching separately reported scheduler timezone",
     )
     parser.add_argument("--tolerance-seconds", type=int, default=60)
     args = parser.parse_args()
@@ -217,6 +244,8 @@ def main() -> int:
                     contract,
                     args.reported_rrule,
                     args.require_timezone_aware_rrule,
+                    args.reported_timezone,
+                    args.require_timezone_evidence,
                 )
             )
         checks = []

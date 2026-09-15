@@ -191,7 +191,7 @@ def normalize(data):
         "delivery_channel": delivery_channel,
         "create_schedule": bool(data.get("create_schedule", False)),
         "host": str(data.get("host", "unknown")),
-        "missed_run_policy": "catch_up_same_day",
+        "missed_run_policy": "catch_up_latest_due",
         "catch_up_dedupe": True,
         "schedule_contract": schedule_contract,
     }

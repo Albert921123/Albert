@@ -280,7 +280,7 @@
       fallback_policy:"extend_empty_sections",
       source_policy:"tier1-first",
       delivery_channel:document.getElementById("delivery-channel").value,
-      missed_run_policy:"catch_up_same_day",
+      missed_run_policy:"catch_up_latest_due",
       catch_up_dedupe:true,
       create_schedule:Boolean(createSchedule),
       host:window.openai ? "codex" : "local"

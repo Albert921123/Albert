@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Decide whether a missed same-day 知讯日报 run needs one catch-up."""
+"""Decide whether the latest due 知讯日报 period needs one catch-up."""
 
 import argparse
 import json
@@ -58,6 +58,17 @@ def load_json_object(path: Path) -> dict:
     return value if isinstance(value, dict) else {}
 
 
+def latest_due_date(now, scheduled_time, cadence):
+    """Return exactly one latest due local date; never backfill a date range."""
+    target = now.date()
+    if now < datetime.combine(target, scheduled_time).replace(tzinfo=now.tzinfo):
+        target -= timedelta(days=1)
+    if cadence == "weekdays":
+        while target.weekday() >= 5:
+            target -= timedelta(days=1)
+    return target
+
+
 def main() -> int:
     configure_utf8_stdio()
     parser = argparse.ArgumentParser()
@@ -79,8 +90,10 @@ def main() -> int:
     zone = resolve_timezone(args.timezone)
     now = parse_now(args.now, zone)
     hour, minute = map(int, args.time.split(":"))
-    scheduled = datetime.combine(now.date(), time(hour, minute)).replace(tzinfo=zone)
-    expected_file = args.output_dir / f"daily-industry-brief-{now.date().isoformat()}.html"
+    scheduled_time = time(hour, minute)
+    target_date = latest_due_date(now, scheduled_time, args.cadence)
+    scheduled = datetime.combine(target_date, scheduled_time).replace(tzinfo=zone)
+    expected_file = args.output_dir / f"daily-industry-brief-{target_date.isoformat()}.html"
     marker_file = args.state_dir / f"last-success-{args.subscription_id}.json"
     marker = load_json_object(marker_file)
     config_state_file = args.config_state_file or (
@@ -94,11 +107,10 @@ def main() -> int:
         if current_fingerprint != computed_fingerprint:
             current_fingerprint = computed_fingerprint
 
-    scheduled_day = args.cadence == "daily" or now.weekday() < 5
     expected_file_valid = is_valid_html_artifact(expected_file)
     marker_artifact = Path(str(marker.get("html_file", ""))) if marker.get("html_file") else None
     marker_artifact_valid = (
-        marker.get("local_date") == now.date().isoformat()
+        marker.get("local_date") == target_date.isoformat()
         and marker_artifact is not None
         and is_valid_html_artifact(marker_artifact)
     )
@@ -108,7 +120,7 @@ def main() -> int:
     )
     marker_valid = marker_artifact_valid and marker_matches_current_config
     already_succeeded = marker_valid if current_fingerprint else (expected_file_valid or marker_valid)
-    catch_up = scheduled_day and now >= scheduled and not already_succeeded
+    catch_up = not already_succeeded
     stale_same_day_result = (
         current_fingerprint is not None
         and (expected_file_valid or marker_artifact_valid)
@@ -116,16 +128,17 @@ def main() -> int:
     )
     reason = (
         "configuration_changed_after_success" if catch_up and stale_same_day_result else
-        "catch_up_required" if catch_up else
+        "latest_due_period_missing" if catch_up else
         "already_succeeded" if already_succeeded else
-        "not_a_scheduled_day" if not scheduled_day else
-        "scheduled_time_not_reached"
+        "not_applicable"
     )
     print(json.dumps({
         "catch_up_required": catch_up,
         "reason": reason,
         "subscription_id": args.subscription_id,
-        "local_date": now.date().isoformat(),
+        "local_date": target_date.isoformat(),
+        "latest_due_date": target_date.isoformat(),
+        "catch_up_scope": "latest-due-only",
         "checked_at": now.isoformat(),
         "scheduled_at": scheduled.isoformat(),
         "expected_file": str(expected_file.resolve()),

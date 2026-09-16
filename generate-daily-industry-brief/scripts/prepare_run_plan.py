@@ -133,7 +133,7 @@ def main():
         "config_fingerprint": args.config_fingerprint,
         "created_at": datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8))).isoformat(),
         "selected_section_count": len(rows),
-        "retrieval_contract": "universal-overseas-parity-v1",
+        "retrieval_contract": "universal-overseas-parity-v2",
         "sections": rows,
         "execution_order": [
             "capability-preflight", "breadth-first-discovery-all-sections",

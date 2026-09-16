@@ -19,6 +19,7 @@ def save(path, value):
 
 REQUIRED_LANES = ("field", "actor", "official", "business-intersection")
 FINAL_OUTCOMES = {"complete", "observed", "expanded", "business-observation", "checked-empty", "limited"}
+BUSINESS_SECTIONS = {"fintech", "sourcing", "matching", "employment", "overseas", "leadership", "enterprise", "capital"}
 def load(path): return json.loads(path.read_text(encoding="utf-8"))
 def csv_values(value): return sorted(set(x.strip() for x in (value or "").split(",") if x.strip()))
 def section_record(state, section_id):
@@ -40,6 +41,10 @@ def assert_state_ledger_consistency(state, ledger):
         ledger_queries=Counter((str(e.get("lane") or ""),str(e.get("query") or ""),str(e.get("raw_results_sha256") or ""),int(e.get("result_count") or 0)) for e in ((ledger_section.get("retrieval_proof") or {}).get("query_evidence") or []))
         if state_queries != ledger_queries:
             raise SystemExit("work-state and ledger query receipts differ for section: "+str(section_id))
+        state_recovery=row.get("post_filter_recovery") or {}
+        ledger_recovery=(ledger_section.get("retrieval_proof") or {}).get("post_filter_recovery") or {}
+        if state_recovery != ledger_recovery:
+            raise SystemExit("work-state and ledger post-filter recovery proof differ for section: "+str(section_id))
 def next_action(state):
     for lane in REQUIRED_LANES:
         for row in state.get("sections") or []:
@@ -78,7 +83,8 @@ def main():
         rows=[{"section_id":r["section_id"],"label":r["label"],"target_card_count":r["target_card_count"],"candidate_review_floor":r["candidate_review_floor"],"source_family_floor":r["source_family_floor"],"actor_classes":r.get("actor_classes") or [],"source_classes":r.get("source_classes") or [],"event_families":r.get("event_families") or [],"profile":profile_rows[r["section_id"]],"queries":{},"candidates":[],"outcome":None} for r in (plan.get("sections") or [])]
         if not rows: raise SystemExit("plan has no sections")
         if len(str(args.pipeline_id or "").strip()) < 16: raise SystemExit("start-work requires a supervisor-issued pipeline-id")
-        save(args.output,{"kind":"zhixun-retrieval-work-state","retrieval_contract":"universal-overseas-parity-v1","pipeline_id":args.pipeline_id,"run_id":plan.get("run_id"),"plan":str(args.plan.resolve()),"plan_sha256":sha(args.plan),"profiles":str(args.profiles.resolve()),"profiles_sha256":sha(args.profiles),"created_at":now_cn(),"updated_at":now_cn(),"sections":rows})
+        if plan.get("retrieval_contract") != "universal-overseas-parity-v2": raise SystemExit("plan uses an obsolete retrieval contract")
+        save(args.output,{"kind":"zhixun-retrieval-work-state","retrieval_contract":"universal-overseas-parity-v2","pipeline_id":args.pipeline_id,"run_id":plan.get("run_id"),"plan":str(args.plan.resolve()),"plan_sha256":sha(args.plan),"profiles":str(args.profiles.resolve()),"profiles_sha256":sha(args.profiles),"created_at":now_cn(),"updated_at":now_cn(),"sections":rows})
         state=load(args.output); print(json.dumps({"ok":True,"state":str(args.output.resolve()),"next":next_action(state)},ensure_ascii=False)); return 0
     if args.action == "next": print(json.dumps(next_action(load(args.state)),ensure_ascii=False)); return 0
     if args.action == "record-query":
@@ -154,17 +160,33 @@ def main():
         if len(all_actors) < 3: raise SystemExit("section must check at least three actor classes")
         if len(all_events) < 3: raise SystemExit("section must check at least three event families")
         scarcity_proof=False
+        recovery={"required": included < target, "completed": included >= target}
         if included < target and "expansion" in row["queries"]:
             expansion=row["queries"]["expansion"]; earlier=set()
+            earlier_actors=set()
             for lane,evidence in row["queries"].items():
-                if lane != "expansion": earlier.update(evidence.get("source_families_checked") or [])
+                if lane != "expansion":
+                    earlier.update(evidence.get("source_families_checked") or [])
+                    earlier_actors.update(evidence.get("actor_classes_checked") or [])
             changed=set(expansion.get("source_families_checked") or [])-earlier
-            scarcity_proof=len(expansion.get("source_families_checked") or [])>=2 and len(changed)>=1 and bool(args.below_target_reason.strip())
-            if not scarcity_proof: raise SystemExit("below-target expansion must check at least two families and add a changed source family")
+            changed_actors=set(expansion.get("actor_classes_checked") or [])-earlier_actors
+            initial_decisions=[str(c.get("decided_at") or "") for c in row["candidates"] if c.get("query_lane") != "expansion"]
+            expansion_at=str(expansion.get("at") or "")
+            reviewed_before_expansion=bool(initial_decisions) and all(value and value <= expansion_at for value in initial_decisions)
+            if not initial_decisions and sum(int(e.get("result_count") or 0) for lane,e in row["queries"].items() if lane != "expansion") == 0:
+                reviewed_before_expansion=True
+            scarcity_proof=(len(expansion.get("source_families_checked") or [])>=2 and len(changed)>=1 and len(changed_actors)>=1 and reviewed_before_expansion and bool(args.below_target_reason.strip()))
+            if not scarcity_proof: raise SystemExit("below-target expansion must run after initial candidate decisions and add both a changed source family and a changed actor class")
+            recovery={"required":True,"completed":True,"initial_candidate_count":len([c for c in row["candidates"] if c.get("query_lane") != "expansion"]),"final_candidate_count":len(row["candidates"]),"initial_review_completed_before_expansion":reviewed_before_expansion,"expansion_recorded_at":expansion_at,"changed_source_families":sorted(changed),"changed_actor_classes":sorted(changed_actors)}
+        planned_actor_classes=set(row.get("actor_classes") or [])
+        if not planned_actor_classes.issubset(all_actors):
+            raise SystemExit("section has not checked every actor class in the immutable plan: "+", ".join(sorted(planned_actor_classes-all_actors)))
+        if row.get("section_id") in BUSINESS_SECTIONS and included < target and not recovery.get("completed"):
+            raise SystemExit("business section cannot close below target before post-filter recovery completes")
         if len(row["candidates"]) < candidate_floor and not scarcity_proof: raise SystemExit("section has not reached the planned candidate review floor")
         if included==0 and args.outcome not in {"checked-empty","limited"}: raise SystemExit("zero-card section must close empty/limited")
         if included>0 and args.outcome in {"checked-empty","limited"}: raise SystemExit("card-bearing section cannot close empty/limited")
-        row.update({"outcome":args.outcome,"candidate_pool_exhausted":included<target,"additional_discovery_completed":"expansion" in row["queries"],"below_target_reason":args.below_target_reason or "","source_families_checked":sorted(all_families),"actor_classes_checked":sorted(all_actors),"event_families_checked":sorted(all_events),"scarcity_proof":scarcity_proof,"closed_at":now_cn()}); state["updated_at"]=now_cn(); save(args.state,state)
+        row.update({"outcome":args.outcome,"candidate_pool_exhausted":included<target,"additional_discovery_completed":"expansion" in row["queries"],"below_target_reason":args.below_target_reason or "","source_families_checked":sorted(all_families),"actor_classes_checked":sorted(all_actors),"event_families_checked":sorted(all_events),"scarcity_proof":scarcity_proof,"post_filter_recovery":recovery,"closed_at":now_cn()}); state["updated_at"]=now_cn(); save(args.state,state)
         print(json.dumps({"ok":True,"next":next_action(state)},ensure_ascii=False)); return 0
     if args.action == "assert-complete":
         state=load(args.state); action=next_action(state)

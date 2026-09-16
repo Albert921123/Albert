@@ -52,6 +52,7 @@ CANDIDATE_FIELDS = (
 )
 
 STATUSES = {"complete", "observed", "expanded", "business-observation", "checked-empty", "limited", "baseline"}
+BUSINESS_SECTIONS = {"fintech", "sourcing", "matching", "employment", "overseas", "leadership", "enterprise", "capital"}
 QUERY_LANES = {"field", "actor", "official", "business-intersection", "expansion"}
 REQUIRED_SECTION_LANES = {"field", "actor", "official", "business-intersection"}
 RELEVANCE_LEVELS = {"A", "B", "C", "D"}
@@ -100,6 +101,15 @@ INCLUDED_LIVE_DECISIONS = {
     "included-business-observation",
 }
 GENERIC_SOURCE_FAMILY_PATTERN = re.compile(r"(?:web\s*search|网络搜索|混合来源|多个媒体)", re.I)
+ANCHORED_BUSINESS_SECTIONS = {"fintech", "sourcing", "matching", "employment", "overseas", "leadership", "enterprise", "capital"}
+ANCHOR_TYPES = {"construction", "building-materials", "real-estate", "infrastructure", "engineering-services", "construction-equipment", "project-owner-or-contractor", "engineering-supply-chain"}
+EXCLUSION_CODES = {
+    "outside-time-window", "original-time-unverified", "source-unverified",
+    "off-topic", "missing-construction-anchor", "duplicate-event",
+    "assigned-to-other-section", "weak-or-speculative", "page-unopenable",
+    "non-substantive", "future-event-only", "other-specific",
+}
+GENERIC_EXCLUSION_REASON = re.compile(r"^(?:原页时间、来源层级、相关度或重复|不符合要求|不合格|无效|排除)$")
 
 
 def is_nonempty(value):
@@ -224,6 +234,10 @@ def main():
             "primary_window_start",
             "primary_window_end",
             "fallback_window_start",
+            "trigger_kind",
+            "scheduled_for",
+            "actual_started_at",
+            "trigger_delay_seconds",
         ):
             if field not in run:
                 issues.append("run missing anti-shortcut field: %s" % field)
@@ -231,6 +245,22 @@ def main():
             issues.append("run audit_contract must be anti-shortcut-v1 for mode %s" % mode)
         if run.get("candidate_pool_origin") not in {"live-search", "direct-fetch", "validated-feed"}:
             issues.append("run has invalid live candidate_pool_origin")
+        trigger_kind = run.get("trigger_kind")
+        if trigger_kind not in {"scheduled", "late-catch-up", "manual-catch-up", "manual"}:
+            issues.append("run has invalid trigger_kind")
+        scheduled_for, scheduled_precision = parse_timestamp(run.get("scheduled_for"))
+        actual_started, actual_precision = parse_timestamp(run.get("actual_started_at"))
+        delay = run.get("trigger_delay_seconds")
+        if not scheduled_for or not actual_started or "date-only" in {scheduled_precision, actual_precision}:
+            issues.append("run scheduled_for and actual_started_at need timezone-aware datetimes")
+        elif not isinstance(delay, int) or isinstance(delay, bool):
+            issues.append("run trigger_delay_seconds must be an integer")
+        else:
+            computed = int((actual_started.astimezone(datetime.timezone.utc) - scheduled_for.astimezone(datetime.timezone.utc)).total_seconds())
+            if abs(computed - delay) > 1:
+                issues.append("run trigger_delay_seconds does not match scheduled_for and actual_started_at")
+            if computed > 59 and trigger_kind == "scheduled":
+                issues.append("late run must use trigger_kind=late-catch-up or manual-catch-up")
         if run.get("selected_section_count") != len(sections):
             issues.append("run selected_section_count does not match sections")
         primary_start, primary_precision = parse_timestamp(run.get("primary_window_start"))
@@ -387,7 +417,7 @@ def main():
                         else:
                             aggregate.update(value.strip() for value in values if is_nonempty(value))
                     raw_path = Path(str(evidence.get("raw_results") or ""))
-                    if not raw_path.is_absolute(): raw_path = args.ledger.parent / raw_path
+                    if not raw_path.is_absolute(): raw_path = args.ledger_file.parent / raw_path
                     raw_hash = str(evidence.get("raw_results_sha256") or "").strip().lower()
                     transport = evidence.get("transport_evidence") if isinstance(evidence.get("transport_evidence"), dict) else {}
                     if not raw_path.is_file() or not re.match(r"^[0-9a-f]{64}$", raw_hash):
@@ -475,6 +505,25 @@ def main():
                                 earlier_families.update(value.strip() for value in evidence.get("source_families_checked", []) if is_nonempty(value))
                         if len(expansion_families) < 2 or not (expansion_families - earlier_families):
                             issues.append("section[%s] expansion must check two families and add a changed source family" % index)
+                        expansion_actors = set(value.strip() for value in expansion_rows[0].get("actor_classes_checked", []) if is_nonempty(value))
+                        earlier_actors = set()
+                        for evidence in query_evidence:
+                            if isinstance(evidence, dict) and evidence.get("lane") != "expansion":
+                                earlier_actors.update(value.strip() for value in evidence.get("actor_classes_checked", []) if is_nonempty(value))
+                        if not (expansion_actors - earlier_actors):
+                            issues.append("section[%s] expansion must add a changed actor class after initial screening" % index)
+                    recovery = proof.get("post_filter_recovery")
+                    if not isinstance(recovery, dict) or recovery.get("required") is not True or recovery.get("completed") is not True:
+                        issues.append("section[%s] below target needs completed post_filter_recovery proof" % index)
+                    else:
+                        if recovery.get("initial_review_completed_before_expansion") is not True:
+                            issues.append("section[%s] recovery expansion must run after initial candidate decisions" % index)
+                        if not isinstance(recovery.get("changed_source_families"), list) or not recovery.get("changed_source_families"):
+                            issues.append("section[%s] recovery needs changed_source_families" % index)
+                        if not isinstance(recovery.get("changed_actor_classes"), list) or not recovery.get("changed_actor_classes"):
+                            issues.append("section[%s] recovery needs changed_actor_classes" % index)
+                        if not is_nonempty(recovery.get("expansion_recorded_at")):
+                            issues.append("section[%s] recovery needs expansion_recorded_at" % index)
                 if isinstance(families, list) and len(set([family.strip() for family in families if is_nonempty(family)])) < min_families and not scarce_pool_proved:
                     issues.append(
                         "section[%s] retrieval_proof needs at least %s independent source families for target %s"
@@ -549,6 +598,13 @@ def main():
         if decision not in DECISIONS:
             issues.append("candidate[%s] has invalid decision" % index)
             continue
+        if decision == "excluded":
+            code = row.get("exclusion_code")
+            reason = str(row.get("reason") or "").strip()
+            if code not in EXCLUSION_CODES:
+                issues.append("candidate[%s] excluded item needs one specific exclusion_code" % index)
+            if len(reason) < 8 or GENERIC_EXCLUSION_REASON.search(reason):
+                issues.append("candidate[%s] excluded item needs a candidate-specific reason" % index)
         if live_contract and decision in INCLUDED_LIVE_DECISIONS:
             for field in ("direct_record_url", "canonical_url", "source_family_id", "event_fingerprint", "time_basis_type", "timestamp_precision", "window_class"):
                 if not is_nonempty(row.get(field)):
@@ -558,6 +614,11 @@ def main():
                 issues.append("candidate[%s] included live item has invalid direct_record_url" % index)
             if row.get("direct_record_kind") not in DIRECT_RECORD_KINDS:
                 issues.append("candidate[%s] included live item has invalid direct_record_kind" % index)
+            if section_id in ANCHORED_BUSINESS_SECTIONS:
+                if row.get("industry_anchor_type") not in ANCHOR_TYPES:
+                    issues.append("candidate[%s] included business item lacks a valid construction industry anchor" % index)
+                if len(str(row.get("industry_anchor_evidence") or "").strip()) < 12:
+                    issues.append("candidate[%s] included business item lacks original-page anchor evidence" % index)
             precision = row.get("timestamp_precision")
             window_class = row.get("window_class")
             basis_type = row.get("time_basis_type")
@@ -689,6 +750,10 @@ def main():
                 issues.append("section %s is below planned candidate review floor: needs %s, found %s" % (section_id, floor, candidate_counts[section_id]))
             if is_count(family_floor) and is_count(row.get("source_family_count")) and row.get("source_family_count") < family_floor and not scarce_pool_proved:
                 issues.append("section %s is below planned source-family floor: needs %s, found %s" % (section_id, family_floor, row.get("source_family_count")))
+            planned_actors = set(value for value in (planned.get("actor_classes") or []) if is_nonempty(value))
+            checked_actors = set(value for value in ((row.get("retrieval_proof") or {}).get("actor_classes_checked") or []) if is_nonempty(value))
+            if planned_actors and not planned_actors.issubset(checked_actors):
+                issues.append("section %s omits planned actor classes: %s" % (section_id, ", ".join(sorted(planned_actors - checked_actors))))
 
     for event_id, decisions in event_decisions.items():
         full_count = sum(1 for decision in decisions if decision in {"included-primary", "included-cross-section", "included-date-observation", "included-expanded", "included-business-observation"})

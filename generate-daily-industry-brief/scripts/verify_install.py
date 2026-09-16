@@ -18,6 +18,7 @@ REQUIRED = (
     "assets/codex-subscription-selector.html",
     "assets/daily-brief-template.html",
     "references/topics.md",
+    "references/industry-anchor-policy.md",
     "references/source-map.md",
     "references/retrieval-audit.md",
     "references/retrieval-routing.md",
@@ -61,7 +62,7 @@ def main():
     configure_utf8_stdio()
     parser = argparse.ArgumentParser()
     parser.add_argument("--skill-dir", type=Path, default=Path(__file__).resolve().parent.parent)
-    parser.add_argument("--expected-version", default="1.42.0")
+    parser.add_argument("--expected-version", default="1.44.0")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
 

@@ -37,6 +37,7 @@ class BriefParser(HTMLParser):
         self.section_records = []
         self.audit_rows = []
         self._audit_row_stack = []
+        self._audit_cell_stack = []
         self.audit_detail_count = 0
         self._section_stack = []
         self._highlights_depth = 0
@@ -75,11 +76,14 @@ class BriefParser(HTMLParser):
             if self._section_stack:
                 self._section_stack[-1]["related_count"] = int(self._section_stack[-1]["related_count"]) + 1
         if data.get("data-audit-row"):
-            audit_row = {"attrs": data, "tag": tag, "cell_count": 0}
+            audit_row = {"attrs": data, "tag": tag, "cell_count": 0, "cells": []}
             self.audit_rows.append(audit_row)
             self._audit_row_stack.append(audit_row)
         elif tag == "span" and self._audit_row_stack:
             self._audit_row_stack[-1]["cell_count"] += 1
+            cell = {"tag": tag, "parts": []}
+            self._audit_row_stack[-1]["cells"].append(cell)
+            self._audit_cell_stack.append(cell)
         if "audit-section-detail" in class_names:
             self.audit_detail_count += 1
         if "empty" in class_names and self._section_stack:
@@ -105,6 +109,8 @@ class BriefParser(HTMLParser):
             self._section_stack.pop()
         if tag == "article" and self._story_stack:
             self._story_stack.pop()
+        if self._audit_cell_stack and tag == self._audit_cell_stack[-1]["tag"]:
+            self._audit_cell_stack.pop()
         if self._audit_row_stack and tag == self._audit_row_stack[-1]["tag"]:
             self._audit_row_stack.pop()
         if tag == "section" and self._highlights_depth:
@@ -113,6 +119,8 @@ class BriefParser(HTMLParser):
     def handle_data(self, data):
         if self._script_parts is not None:
             self._script_parts.append(data)
+        if self._audit_cell_stack:
+            self._audit_cell_stack[-1]["parts"].append(data)
 
 
 def main() -> int:
@@ -373,9 +381,33 @@ def main() -> int:
         try:
             ledger = json.loads(args.ledger.read_text(encoding="utf-8"))
             ledger_candidates = ledger.get("candidates", []) if isinstance(ledger, dict) else []
+            ledger_sections = ledger.get("sections", []) if isinstance(ledger, dict) else []
         except Exception as exc:
             ledger_candidates = []
+            ledger_sections = []
             issues.append(f"cannot read linked retrieval ledger: {exc}")
+        section_audit = {
+            str(row.get("section_id")): row for row in ledger_sections if isinstance(row, dict)
+        }
+        for audit_row in document.audit_rows:
+            sid = audit_row["attrs"].get("data-audit-row", "")
+            source = section_audit.get(sid)
+            if source is None:
+                issues.append(f"HTML audit row {sid!r} is absent from linked ledger sections")
+                continue
+            cells = [" ".join("".join(cell["parts"]).split()) for cell in audit_row.get("cells", [])]
+            expected = [
+                str(source.get("label", "")), str(source.get("source_family_count", 0)),
+                str(source.get("candidate_count", 0)), str(source.get("unique_event_count", 0)),
+                str(source.get("cross_section_card_count", 0)), str(source.get("related_count", 0)),
+                str(source.get("status", "")),
+            ]
+            if cells != expected:
+                issues.append(f"HTML audit row {sid!r} does not reconcile with ledger: found {cells!r}, expected {expected!r}")
+        html_audit_ids = {row["attrs"].get("data-audit-row", "") for row in document.audit_rows}
+        for sid in section_audit:
+            if sid not in html_audit_ids:
+                issues.append(f"linked ledger section {sid!r} is absent from HTML audit")
         included_decisions = {
             "included-primary",
             "included-date-observation",

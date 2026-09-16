@@ -13,11 +13,11 @@ Classify every fresh verified candidate from the perspective of each selected se
 - **C / 行业影响**: the event is outside the core field but has a direct, decision-useful macro impact on the section. Use at most one C-level full card when the row has no A/B story, and label it `行业影响`.
 - **D / 弱关联**: relevance requires speculative or multi-hop inference. Exclude it.
 
-For broad sections (`fintech`, `overseas`, `leadership`, `enterprise`, `capital`, `digital`, `government`, `industry-data`, `green`, `extended`) and every broad custom interest, field relevance is sufficient for A-level admission. Do not require construction words or an AEC customer. Keep construction-only admission for inherently AEC rows such as `sourcing`, `employment`, `informatization` and `construction-tech`.
+For the eight business-and-market sections (`fintech`, `sourcing`, `matching`, `employment`, `overseas`, `leadership`, `enterprise`, `capital`), a formal card must contain an explicit construction-industry anchor: construction, building materials, real estate, infrastructure, engineering services, construction equipment, or their project/supply-chain actors and customers. Broad field-only results may remain discovery candidates, but may not be rendered. See `industry-anchor-policy.md`. Other broad sections follow their own row definition; `digital` may still admit major general-AI news.
 
 | ID | 中文名 | Include | Query cues | Lookback |
 |---|---|---|---|---|
-| `fintech` | 数科 | 支撑金融服务、企业金融和产业金融的数据科技平台，包括供应链金融、保理、融资、结算、租赁、信用、可信数据与风控，以及客户落地、合作、经营和监管动态；建筑及产业链案例优先，但不是唯一合格范围 | 供应链金融；产业金融；数字金融；保理；应收账款；电子债权；确权；可信数据；融资平台；金融科技；企业金融；数据科技 | strict 24h |
+| `fintech` | 数科 | 服务建筑、建材、房地产、基础设施与工程供应链经营的数据科技和产业金融能力，包括数字采购/交易、供应链金融、保理、融资、结算、租赁、项目资金监管、可信数据与经营分析；泛银行科技、消费金融或无建筑产业对象的通用数科动态不入选 | 建筑供应链金融；工程保理；项目资金监管；建材数字交易；电子债权；确权；工程结算；建筑数据资产；产业平台 | strict 24h |
 | `sourcing` | 寻源 | 建筑工程招标、采购需求、供应商征集、品类与价格线索 | 招标公告；采购需求；供应商征集；集采；框架协议 | strict 24h |
 | `matching` | 撮合 | 产业合作、供需对接、联合项目、签约与资源互补 | 战略合作；项目对接；供需撮合；联合解决方案；签约 | strict 24h |
 | `employment` | 用工 | 建筑人才政策、招聘与劳务需求、工程和数字化岗位、紧缺技能、工资社保、安全、裁员与职业资格 | 建筑人才；招聘需求；用工；劳务市场；项目经理；工程师；BIM；数字人才；薪酬；裁员；职业资格 | strict 24h |
@@ -32,7 +32,7 @@ For broad sections (`fintech`, `overseas`, `leadership`, `enterprise`, `capital`
 | `industry-data` | 行业数据 | 建筑及相关产业的投资、开工、销售、订单、产值、融资、价格、PMI、产能与景气指标，包括地产、基建、建材和工程机械 | 建筑业产值；固定资产投资；房地产；基建；新开工；订单；PMI；钢铁；水泥；玻璃；工程机械；融资；景气指数 | strict 24h |
 | `standards` | 标准规范 | 国家、行业、地方和团体标准，以及立项、征求意见、实施通知、技术导则、认证规则、工程计价/审查/验收执行细则 | 标准发布；规范修订；征求意见；立项；实施通知；技术导则；认证规则；工程计价；施工验收；审图 | strict 24h + expanded |
 | `green` | 绿色低碳 | 绿色建筑、节能改造、绿色建材、碳市场和核算、绿电交易、光伏储能、能效管理、零碳园区、循环经济与ESG经营披露 | 绿色建筑；近零能耗；节能改造；双碳；绿色建材；碳市场；绿电；光伏；储能；能效；ESG；零碳园区；循环经济 | strict 24h + expanded |
-| `extended` | 拓展阅读 | 新发布的权威研究、白皮书、深度报告、官方统计解读、协会洞察、公开券商研究和趋势分析 | 研究报告；白皮书；行业展望；专题研究；官方统计；协会报告；券商研报；案例复盘 | strict 24h + business-observation |
+| `extended` | 拓展阅读 | 与建筑、建材、房地产、基础设施或工程产业链直接相关的深度内容，覆盖政策与宏观深读、行业研究报告、企业与项目案例、技术与模式观察、趋势与风险专题；快讯改写、泛财经评论和无产业锚点内容不入选 | 政策解读；宏观深读；行业研究报告；白皮书；企业案例；项目复盘；技术路线；商业模式；趋势；风险专题 | strict 24h + business-observation |
 
 ## Classification rules
 

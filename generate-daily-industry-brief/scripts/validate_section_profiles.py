@@ -7,6 +7,9 @@ REQUIRED_POOLS = ("regulators", "central_enterprises", "local_enterprises", "lis
 REQUIRED_SOURCES = ("official", "disclosure_or_transaction", "national_media", "vertical_media")
 REQUIRED_KEYWORDS = ("synonyms", "subfields", "actions", "risk_terms")
 REQUIRED_QUERIES = ("field", "actor", "official", "business_intersection", "expansion")
+ANCHORED_BUSINESS_SECTIONS = {"fintech", "sourcing", "matching", "employment", "overseas", "leadership", "enterprise", "capital"}
+ANCHOR_TYPES = {"construction", "building-materials", "real-estate", "infrastructure", "engineering-services", "construction-equipment", "project-owner-or-contractor", "engineering-supply-chain"}
+EXTENDED_TRACKS = {"policy-macro", "industry-research", "enterprise-project-case", "technology-business-model", "trend-risk"}
 
 def filled_list(value):
     return isinstance(value, list) and any(isinstance(x, str) and x.strip() for x in value)
@@ -61,6 +64,24 @@ def main():
         if not filled_list(row.get("event_types")): issues.append(p + " event_types must be non-empty")
         if not isinstance(row.get("time_policy"), dict) or not row.get("time_policy"):
             issues.append(p + " time_policy must be non-empty")
+        if sid in ANCHORED_BUSINESS_SECTIONS:
+            anchor = row.get("industry_anchor_policy")
+            if not isinstance(anchor, dict):
+                issues.append(p + " missing industry_anchor_policy")
+            else:
+                if anchor.get("required") is not True:
+                    issues.append(p + " industry_anchor_policy.required must be true")
+                types = set(anchor.get("allowed_types") or [])
+                if not ANCHOR_TYPES.issubset(types):
+                    issues.append(p + " industry_anchor_policy.allowed_types must contain every construction anchor type")
+                if len(str(anchor.get("admission_test") or "").strip()) < 20:
+                    issues.append(p + " industry_anchor_policy.admission_test is too thin")
+                if len(str(anchor.get("exclusion_rule") or "").strip()) < 15:
+                    issues.append(p + " industry_anchor_policy.exclusion_rule is too thin")
+        if sid == "extended":
+            tracks = set(row.get("extended_reading_tracks") or [])
+            if tracks != EXTENDED_TRACKS:
+                issues.append(p + " extended_reading_tracks must contain exactly the five prescribed tracks")
         queries = row.get("queries")
         if not isinstance(queries, dict):
             issues.append(p + " missing queries")
